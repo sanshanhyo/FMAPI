@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../src/FMAPI.Sdk/FMAPI.Sdk.csproj" />
+    <EmbeddedResource Include="mod.json" />
+  </ItemGroup>
+</Project>

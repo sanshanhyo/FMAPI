@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-framework:
+    name: Offline framework (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Restore
+        run: dotnet restore FMAPI.slnx
+      - name: Build
+        run: dotnet build FMAPI.slnx --configuration Release --no-restore
+      - name: Test
+        run: dotnet test FMAPI.slnx --configuration Release --no-build
+      - name: Run offline demo
+        run: dotnet run --project src/FMAPI.Cli --configuration Release --no-build -- demo

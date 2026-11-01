@@ -1,0 +1,30 @@
+name: Bug report
+description: Report reproducible framework or adapter behavior.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Expected and observed behavior
+      description: Explain what happened and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include commands or a small owned/synthetic example. Remove private data.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions and platform
+      description: Include FMAPI commit, .NET SDK, OS, architecture, and adapter. For game integration, include exact game build, channel, and storefront.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant output
+      description: Add concise logs without credentials, saves, game binaries, or personal information.

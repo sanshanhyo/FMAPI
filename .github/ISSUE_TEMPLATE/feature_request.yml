@@ -1,0 +1,23 @@
+name: Feature or adapter proposal
+description: Propose a concrete API, host behavior, or game adapter capability.
+title: "[Proposal]: "
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case and resulting behavior
+      description: Describe the mod author or host problem and the behavior that would solve it.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed scope and public API impact
+      description: Identify affected contracts, lifecycle, capabilities, or command policy.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Adapter evidence and validation plan
+      description: For game work, identify exact build/platform/storefront and distinguish observed behavior from assumptions. Describe tests using owned or synthetic data.

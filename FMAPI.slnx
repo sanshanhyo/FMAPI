@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FMAPI.Sdk/FMAPI.Sdk.csproj" />
+    <Project Path="src/FMAPI.Core/FMAPI.Core.csproj" />
+    <Project Path="src/FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
+    <Project Path="src/FMAPI.Cli/FMAPI.Cli.csproj" />
+  </Folder>
+  <Folder Name="/examples/">
+    <Project Path="examples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FMAPI.Core.Tests/FMAPI.Core.Tests.csproj" />
+  </Folder>
+</Solution>

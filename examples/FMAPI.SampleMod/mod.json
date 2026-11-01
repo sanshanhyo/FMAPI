@@ -1,0 +1,7 @@
+{
+  "id": "org.fmapi.sample",
+  "name": "FMAPI Offline Sample",
+  "version": "0.1.0",
+  "apiVersion": "0.1.0",
+  "requestedCapabilities": ["GameRead", "Events", "UiExtensions", "GameWrite"]
+}

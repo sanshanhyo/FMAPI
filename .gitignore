@@ -1,0 +1,25 @@
+# .NET build output
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# IDE and machine-local files
+.vs/
+.idea/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+
+# Local experiments and game-owned material
+local-game/
+local-data/
+*.dmp
+*.log
