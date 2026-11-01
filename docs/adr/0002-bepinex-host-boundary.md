@@ -12,6 +12,15 @@ Game reads and events must come from verified internal business objects, functio
 
 Prioritize one current Windows game build that actually works. An update may require a new adapter. Unknown/unverified builds must be refused; a general cross-version abstraction is not a prerequisite for the first verified read.
 
+
+## Long-term domain coverage
+
+The long-term ambition is to expose all operations a user can perform in the game and most readable game information through domain APIs. This is a coverage vision, not a guarantee of complete feasibility, a current milestone, or authorization for live memory writes. FMAPI serves third-party mods broadly; FA's immediate needs must not define the limits of the public API.
+
+Expand incrementally across players, teams/clubs, tactics, training, transfers/contracts, matches, schedules and finances as evidence and real mod use cases justify each capability. Do not predeclare large sets of empty or pretend-supported interfaces. For each implemented capability, document its API version and supported game builds, explicit support/unavailable status, required game/save state, thread/lifecycle constraints and known side effects. Readability does not imply writability, and availability of a game UI action does not itself prove a callable, supported adapter operation.
+
+Prioritize a small working subset on the current build, then extend verified coverage. Unsupported or unsafe-to-implement operations remain explicit gaps rather than simulated success. This decision changes no runtime behavior and does not expand the current implementation or deployment scope.
+
 ## Read, Event and Command API scope
 
 FMAPI's long-term scope includes both observing and modifying supported game state. Keep three domain-facing surfaces:
