@@ -11,6 +11,7 @@ try
     if (args.Length == 1 && args[0] == "--self-test")
     {
         if (Bounds.Count(16, 40, 48, 8, 8) != 3) throw new Exception("Count");
+        if (Bounds.Count(0,0,0,8,8)!=0 || Bounds.Count(16,16,32,8,8)!=0)throw new Exception("Empty vector");
         foreach (var test in new Action[] {
             () => Bounds.Count(32,16,40,8,8), () => Bounds.Count(16,40,32,8,8),
             () => Bounds.Count(16,25,32,8,8), () => Bounds.Count(16,96,96,8,8) })
@@ -18,13 +19,22 @@ try
         if (Text.Decode(new byte[]{3,0,0,0,0xE4,0xB8,0xAD,0}) != "\u4E2D") throw new Exception("UTF8");
         foreach (var sample in new byte[][] { [2,0,0,0,65,0], [1,0,0,0,0xFF,0], [1,0,0,0,65,66] })
         { try { Text.Decode(sample); } catch (Exception e) when(e is InvalidDataException or DecoderFallbackException) { continue; } throw new Exception("Invalid text accepted"); }
-        Console.WriteLine("PASS: vector bounds and length-prefixed UTF-8 contracts");
+        if(GameDate.Decode((2024u<<16)|60)!="2024-02-29" || GameDate.Decode((2025u<<16)|60)!="2025-03-01" || GameDate.Decode((2024u<<16)|0xFE00|60)!="2024-02-29" || GameDate.Decode((1900u<<16)|1)!=null || GameDate.Decode((2025u<<16)|366)!=null || GameDate.Decode(0)!=null)throw new Exception("Date decode");
+        var reads=0;
+        foreach(var address in new ulong[]{0,ulong.MaxValue})
+        {try{SafeRead.Exact(address,8,(a,n)=>{reads++;return new byte[n];});}catch(InvalidDataException){continue;}throw new Exception("Invalid pointer accepted");}
+        if(reads!=0)throw new Exception("Invalid pointer reached transport");
+        try{SafeRead.Exact(65536,8,(_,_)=>new byte[4]);throw new Exception("Short read accepted");}catch(InvalidDataException){}
+        try{SafeRead.Exact(65536,8,(_,_)=>throw new IOException("unmapped"));throw new Exception("Failed read accepted");}catch(IOException){}
+        Console.WriteLine("PASS: vector/empty bounds, strict UTF-8, packed dates, invalid pointers and failed reads");
         return 0;
     }
-    if(args.Length != 2) throw new ArgumentException("Usage: FMAPI.MessageProbe <pid> <game_plugin.dll path>; or --self-test");
+    if(args.Length is not (2 or 3) || args.Length==3 && args[2]!="--verify-repeat") throw new ArgumentException("Usage: FMAPI.MessageProbe <pid> <game_plugin.dll path> [--verify-repeat]; or --self-test");
     if(!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Windows only");
     using var probe = new Probe(int.Parse(args[0]), Path.GetFullPath(args[1]));
-    Console.WriteLine(JsonSerializer.Serialize(probe.Capture(),new JsonSerializerOptions{WriteIndented=true}));
+    var result=probe.Capture();
+    if(args.Length==3 && JsonSerializer.Serialize(result)!=JsonSerializer.Serialize(probe.Capture()))throw new InvalidOperationException("Repeated capture differs; no stable result emitted");
+    Console.WriteLine(JsonSerializer.Serialize(new {repeatVerified=args.Length==3,result},new JsonSerializerOptions{WriteIndented=true}));
     return 0;
 }
 catch(Exception error)
@@ -52,6 +62,25 @@ static class Text
         return new UTF8Encoding(false,true).GetString(data,4,length);
     }
 }
+static class GameDate
+{
+    public static string? Decode(uint raw)
+    {
+        int year=(int)(raw>>16),day=(int)(raw&0x1FF);
+        if(year<1 || year>9999 || day<1 || day>(DateTime.IsLeapYear(year)?366:365) || year==1900 && day==1)return null;
+        return new DateOnly(year,1,1).AddDays(day-1).ToString("yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture);
+    }
+}
+static class SafeRead
+{
+    public static byte[] Exact(ulong address,int size,Func<ulong,int,byte[]> transport)
+    {
+        if(size<0 || size>8192 || address<65536 || address>0x00007FFFFFFFFFFFUL-(uint)size)throw new InvalidDataException("Read address/size rejected");
+        var data=transport(address,size);
+        if(data.Length!=size)throw new InvalidDataException("Read incomplete");
+        return data;
+    }
+}
 sealed class Probe : IDisposable
 {
     const string Hash="BC940E472418FC5C214208D7CF30FECF600F689B6F9D71C11BA19A2DF0FE057F";
@@ -77,9 +106,12 @@ sealed class Probe : IDisposable
     {
         if(address==0 || size<0 || size>8192 || (budget-=size)<0)throw new InvalidDataException("Read budget/address rejected");
         if(process.HasExited || process.StartTime!=started)throw new InvalidOperationException("Process changed");
-        var result=new byte[size];
-        if(size>0 && (!Native.ReadProcessMemory(handle,(IntPtr)address,result,(nuint)size,out var count)||count!=(nuint)size))throw new InvalidOperationException("Read incomplete");
-        return result;
+        return SafeRead.Exact(address,size,(location,length)=>
+        {
+            var result=new byte[length];
+            if(length>0 && (!Native.ReadProcessMemory(handle,(IntPtr)location,result,(nuint)length,out var count)||count!=(nuint)length))throw new InvalidOperationException("Read incomplete");
+            return result;
+        });
     }
     ulong Pointer(ulong address)=>BitConverter.ToUInt64(Read(address,8));
     int Offset(int rva)
@@ -102,12 +134,15 @@ sealed class Probe : IDisposable
     }
     public object Capture()
     {
+        budget=65536;
         var root=Pointer(moduleBase+0x56F3008);var rootHeader=Read(root,0x30);
         if(BitConverter.ToUInt64(rootHeader)!=moduleBase+0x4E2D678 || TypeName(root)!=".?AVHUMAN_NON_PLAYER_MANAGER@@")throw new InvalidDataException("Human manager root mismatch");
         var begin=BitConverter.ToUInt64(rootHeader,0x18);
         var owners=Bounds.Count(begin,BitConverter.ToUInt64(rootHeader,0x20),BitConverter.ToUInt64(rootHeader,0x28),8,16);
         if(owners!=1)throw new InvalidDataException("Requires exactly one human manager; active owner selection is not implemented");
-        var owner=Pointer(begin);var inbox=Pointer(owner+0x350);var inboxHeader=Read(inbox,24);
+        var owner=Pointer(begin);
+        if(Pointer(owner)!=moduleBase+0x4CC086C || Pointer(owner+0x440)!=moduleBase+0x4CC08D8 || TypeName(owner+0x440)!=".?AVHUMAN_NON_PLAYER@db@@")throw new InvalidDataException("Human owner type mismatch");
+        var inbox=Pointer(owner+0x350);var inboxHeader=Read(inbox,24);
         var first=BitConverter.ToUInt64(inboxHeader);
         var count=Bounds.Count(first,BitConverter.ToUInt64(inboxHeader,8),BitConverter.ToUInt64(inboxHeader,16),8,32768);
         var take=Math.Min(count,32);var pointers=take==0?Array.Empty<byte>():Read(first,take*8);
@@ -116,12 +151,12 @@ sealed class Probe : IDisposable
         {
             var item=BitConverter.ToUInt64(pointers,i*8);var type=TypeName(item);var fields=Read(item+0x88,16);
             welcome |= type==".?AVWELCOME_TO_THE_CLUB_NEWS@@";
-            messages.Add(new {idCandidate=BitConverter.ToInt32(fields,8),dateRaw=BitConverter.ToUInt32(fields),nativeType=type,title=(string?)null,body=(string?)null});
+            messages.Add(new {idCandidate=BitConverter.ToInt32(fields,8),dateRaw=BitConverter.ToUInt32(fields),date=GameDate.Decode(BitConverter.ToUInt32(fields)),nativeType=type,title=(string?)null,body=(string?)null});
             if(!Read(item+0x88,16).SequenceEqual(fields))throw new InvalidOperationException("Message changed");
         }
         object? template=welcome?ReadWelcomeTemplate():null;
         if(Pointer(moduleBase+0x56F3008)!=root || !Read(root,0x30).SequenceEqual(rootHeader) || Pointer(begin)!=owner || Pointer(owner+0x350)!=inbox || !Read(inbox,24).SequenceEqual(inboxHeader) || (take>0 && !Read(first,take*8).SequenceEqual(pointers)))throw new InvalidOperationException("Inbox changed");
-        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,messages,welcomeTitleTemplate=template,unsupported=new[]{"formatted title","body","decoded date","active owner in multiplayer"}};
+        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
     }
     object ReadWelcomeTemplate()
     {

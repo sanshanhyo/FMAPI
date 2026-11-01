@@ -35,3 +35,15 @@ Localization lookup at RVA 0x10A250 uses the root at RVA 0x56F1C28, its implemen
 
 This is a partial usable diagnostic entry point: message type, candidate ID, raw date, and one loaded title-template family. It is not full message text support. General title/body formatting, parameter resolution, date semantics, sender/related-entity extraction, multiplayer ownership and native lifetime synchronization remain unimplemented. External root/vector rechecks do not guarantee atomicity. The diagnostic reports these limits in its JSON result and README.
 
+## Follow-up: date decoding and repeat validation
+
+The native date formatter at RVA 0x9E56D0 reads the year from word +2, masks the first word with 0x1FF, and converts that one-based day of year with leap-year handling. It explicitly treats year 1900/day 1 as invalid. The probe now independently decodes this layout and rejects impossible dates. Other packed bits are not interpreted. Synthetic cases cover leap days, non-leap days, masked flags and the invalid sentinel.
+
+The human-manager collection stores complete objects with a vbptr, not a primary RTTI vptr. The exact HUMAN_NON_PLAYER vbptr is RVA 0x4CC086C; its PERSON subobject at +0x440 has vtable RVA 0x4CC08D8. Both and the subobject RTTI are now verified before following the personal message vector. This supports the single-human-manager association; it still does not establish active multiplayer selection or UI-specific filtering.
+
+Two consecutive fresh captures agreed on the returned message metadata, decoded dates and template segments. The optional repeat check fails closed on disagreement. Candidate IDs were unchanged in these observations, but their persistence across save/load, deletion or new sessions remains unverified. Empty vectors, invalid addresses, short reads and transport failures now have synthetic checks.
+
+Further bounded inspection confirmed that the welcome message's +0xA0 parameter is a TEAM object and TEAM +0x30 is a CLUB object. A related club short name was readable. That does not establish all rules of the team's short-name token, so no inferred formatted title is returned. This layout fact was cross-checked against existing technical observations; no neighboring FA implementation was copied. The probe's string decoder was independently authored for the localization data before this cross-check.
+
+The known title formatter at RVA 0x36B0BC0 constructs output and binds business objects; its localization lookup at RVA 0x10A250 updates counters and may lazily load data. Calling these functions would therefore exceed pure external-memory reading and require validated ABI, game-thread/lifecycle ownership and output allocation/release handling. Neither was invoked. A verified business-level body formatter or stored complete body has not yet been identified; there is no justified function-call request for body extraction yet.
+
