@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <BepInExCoreDir Condition="'$(BepInExCoreDir)' == ''">$(BepInExRoot)/BepInEx/core</BepInExCoreDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../FMAPI.Core/FMAPI.Core.csproj" />
+    <ProjectReference Include="../FMAPI.Adapters.Windows/FMAPI.Adapters.Windows.csproj" />
+    <Reference Include="BepInEx.Core">
+      <HintPath>$(BepInExCoreDir)/BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>$(BepInExCoreDir)/BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="ValidateBepInExReferences" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(BepInExCoreDir)/BepInEx.Core.dll') Or !Exists('$(BepInExCoreDir)/BepInEx.Unity.IL2CPP.dll')"
+           Text="Set BepInExRoot to an extracted, trusted BepInEx 6 Unity IL2CPP package, or set BepInExCoreDir. No download or game installation is performed." />
+  </Target>
+</Project>

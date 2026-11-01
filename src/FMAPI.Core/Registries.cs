@@ -1,3 +1,4 @@
+using FMAPI.Internal;
 using FMAPI.Sdk;
 
 namespace FMAPI.Core;
@@ -96,10 +97,10 @@ internal sealed class UiRegistry
     public IDisposable Register(ModScope owner, UiExtension extension)
     {
         ArgumentNullException.ThrowIfNull(extension);
-        ArgumentException.ThrowIfNullOrWhiteSpace(extension.Id);
-        ArgumentException.ThrowIfNullOrWhiteSpace(extension.Title);
-        ArgumentException.ThrowIfNullOrWhiteSpace(extension.Placement);
-        if (!Enum.IsDefined(extension.Kind))
+        Guard.NotBlank(extension.Id);
+        Guard.NotBlank(extension.Title);
+        Guard.NotBlank(extension.Placement);
+        if (!Enum.IsDefined(typeof(UiExtensionKind), extension.Kind))
         {
             throw new ArgumentException("Unknown UI extension kind.", nameof(extension));
         }

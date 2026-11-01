@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+using FMAPI.Internal;
 using FMAPI.Sdk;
 
 namespace FMAPI.Core;
@@ -12,8 +12,8 @@ public sealed class ModGrant
 
     public ModGrant(IEnumerable<ModCapability> capabilities, IEnumerable<string>? allowedWriteCommands = null)
     {
-        Capabilities = (capabilities ?? throw new ArgumentNullException(nameof(capabilities))).ToFrozenSet();
-        AllowedWriteCommands = (allowedWriteCommands ?? []).ToFrozenSet(StringComparer.Ordinal);
+        Capabilities = new SnapshotSet<ModCapability>(capabilities ?? throw new ArgumentNullException(nameof(capabilities)));
+        AllowedWriteCommands = new SnapshotSet<string>(allowedWriteCommands ?? [], StringComparer.Ordinal);
     }
 }
 
@@ -25,7 +25,7 @@ public sealed class ModHostOptions
     public ModHostOptions(bool enableWrites = false, IEnumerable<string>? allowedWriteCommands = null)
     {
         EnableWrites = enableWrites;
-        AllowedWriteCommands = (allowedWriteCommands ?? []).ToFrozenSet(StringComparer.Ordinal);
+        AllowedWriteCommands = new SnapshotSet<string>(allowedWriteCommands ?? [], StringComparer.Ordinal);
     }
 }
 

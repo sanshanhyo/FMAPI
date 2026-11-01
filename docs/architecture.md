@@ -1,6 +1,6 @@
 # Architecture
 
-FMAPI keeps public mod contracts separate from host policy and game-build integration. The current implementation runs entirely offline on .NET 10.
+FMAPI keeps public mod contracts separate from host policy and game-build integration. SDK/Core target .NET 6 and .NET 10; the CLI and examples remain .NET 10. All current executable behavior is offline.
 
 ```text
 Sample mod / future third-party mods
@@ -59,3 +59,11 @@ The policy governs calls through FMAPI. It is not a security boundary against ar
 The SDK API version identifies framework contracts. Game identity and capabilities belong to the adapter. A compatible API version does not establish game compatibility, and a platform build does not establish successful runtime integration.
 
 Keep game offsets, fingerprints, internal types, and private bootstrap details out of public SDK contracts. Record verified adapter support using the [compatibility evidence requirements](compatibility.md).
+
+## Windows host direction
+
+Reuse BepInEx for bootstrap and plugin loading; FMAPI owns domain APIs, scoped services and game adapters. See [the host boundary decision](adr/0002-bepinex-host-boundary.md) for the runtime-target prerequisite. Internal business objects/functions/lifecycle are the only allowed read/event sources; UI scraping and UI-driven fallbacks are excluded.
+
+`Adapters.Windows` currently contains only an explicitly unavailable placeholder. It never reads a process or returns a snapshot. The CLI's `windows-status` command reports this without falling back to the mock; exit code 3 means integration is unavailable. Existing mock demonstration behavior is unchanged.
+
+The opt-in `FMAPI.Host.BepInEx` project references the external BepInEx package and owns one default-deny Core host. Consumers register SDK mods through its thin wrapper API and dispose the returned registration on unload. Its session logic is checked offline; actual chainloader/Unity execution is unverified. See [bridge build instructions](bepinex-host.md).

@@ -1,3 +1,4 @@
+using FMAPI.Internal;
 using System.Text.RegularExpressions;
 using FMAPI.Sdk;
 
@@ -22,12 +23,12 @@ public sealed class ModHost : IDisposable
         this.options = options ?? new ModHostOptions();
     }
 
-    public IReadOnlyList<string> LoadedModIds => mods.Keys.Order(StringComparer.Ordinal).ToArray();
+    public IReadOnlyList<string> LoadedModIds => mods.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray();
     public IReadOnlyList<RegisteredUiExtension> UiExtensions => ui.Snapshot();
 
     public void Load(IMod mod, ModGrant? grant = null)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
+        Guard.NotDisposed(disposed, this);
         ArgumentNullException.ThrowIfNull(mod);
         var manifest = mod.Manifest ?? throw new ModLoadException("Mod manifest is required.");
         ValidateManifest(manifest);
@@ -60,7 +61,7 @@ public sealed class ModHost : IDisposable
 
     public bool Unload(string modId)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
+        Guard.NotDisposed(disposed, this);
         if (!mods.TryGetValue(modId, out var scope))
         {
             return false;
@@ -72,7 +73,7 @@ public sealed class ModHost : IDisposable
 
     public EventDispatchReport Publish<TEvent>(TEvent value)
     {
-        ObjectDisposedException.ThrowIf(disposed, this);
+        Guard.NotDisposed(disposed, this);
         return events.Publish(value);
     }
 
@@ -119,7 +120,7 @@ public sealed class ModHost : IDisposable
         {
             throw new ModLoadException($"API {manifest.ApiVersion} is unsupported; host API is {expected}.");
         }
-        if (manifest.RequestedCapabilities.Any(capability => !Enum.IsDefined(capability)))
+        if (manifest.RequestedCapabilities.Any(capability => !Enum.IsDefined(typeof(ModCapability), capability)))
         {
             throw new ModLoadException("Manifest contains an unknown capability.");
         }

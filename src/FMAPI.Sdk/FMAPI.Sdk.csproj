@@ -1,1 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk" />
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework />
+    <TargetFrameworks>net6.0;net10.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/Compatibility.cs" Link="Internal/Compatibility.cs" />
+  </ItemGroup>
+</Project>

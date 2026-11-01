@@ -1,12 +1,23 @@
 using FMAPI.Adapters.Mock;
+using FMAPI.Adapters.Windows;
 using FMAPI.Core;
 using FMAPI.SampleMod;
 using FMAPI.Sdk;
+
+if (args is ["windows-status"])
+{
+    var unavailable = new UnavailableWindowsAdapter();
+    Console.WriteLine($"{unavailable.Descriptor.Id}: unavailable");
+    Console.WriteLine(UnavailableWindowsAdapter.UnavailableReason);
+    Console.WriteLine("No process was inspected; no game build or capabilities were detected. No synthetic fallback.");
+    return 3;
+}
 
 if (args.Length != 1 || args[0] != "demo")
 {
     Console.WriteLine("FMAPI 0.1.0-alpha.1 — Football Manager Modding API");
     Console.WriteLine("Usage: dotnet run --project src/FMAPI.Cli -- demo");
+    Console.WriteLine("       dotnet run --project src/FMAPI.Cli -- windows-status (unavailable: exit 3)");
     Console.WriteLine("The demo uses synthetic in-memory data. No real-game adapter is available.");
     return args.Length == 0 || args is ["--help"] or ["-h"] ? 0 : 2;
 }

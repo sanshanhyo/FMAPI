@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework />
+    <TargetFrameworks>net6.0;net10.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <OutputType>Exe</OutputType>
+    <UseAppHost>false</UseAppHost>
+    <!-- Intentionally exercise the pinned BepInEx runtime; not a runtime upgrade recommendation. -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/FMAPI.Core/FMAPI.Core.csproj" />
+    <ProjectReference Include="../../src/FMAPI.Adapters.Windows/FMAPI.Adapters.Windows.csproj" />
+    <Compile Include="../../src/FMAPI.Host.BepInEx/HostSession.cs" Link="HostSession.cs" />
+  </ItemGroup>
+</Project>

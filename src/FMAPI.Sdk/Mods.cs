@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+using FMAPI.Internal;
 using System.Text.Json;
 
 namespace FMAPI.Sdk;
@@ -31,8 +31,7 @@ public sealed class ModManifest
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Version = version ?? throw new ArgumentNullException(nameof(version));
         ApiVersion = apiVersion ?? throw new ArgumentNullException(nameof(apiVersion));
-        RequestedCapabilities = (requestedCapabilities ?? throw new ArgumentNullException(nameof(requestedCapabilities)))
-            .ToFrozenSet();
+        RequestedCapabilities = new SnapshotSet<ModCapability>(requestedCapabilities ?? throw new ArgumentNullException(nameof(requestedCapabilities)));
     }
 
     public static ModManifest Parse(string json)
@@ -42,7 +41,7 @@ public sealed class ModManifest
         var capabilities = root.GetProperty("requestedCapabilities").EnumerateArray()
             .Select(element => element.GetString() is { } value
                 && Enum.TryParse<ModCapability>(value, ignoreCase: false, out var capability)
-                && Enum.IsDefined(capability)
+                && Enum.IsDefined(typeof(ModCapability), capability)
                 && capability.ToString() == value
                     ? capability
                     : throw new FormatException("Unknown mod capability."));

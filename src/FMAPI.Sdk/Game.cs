@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+using FMAPI.Internal;
 using System.Collections.ObjectModel;
 
 namespace FMAPI.Sdk;
@@ -17,12 +17,12 @@ public sealed class AdapterDescriptor
     public AdapterDescriptor(string id, GameBuildInfo build, bool supportsReads, bool supportsWrites,
         IEnumerable<string>? supportedWriteCommands = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+        Guard.NotBlank(id);
         Id = id;
         Build = build ?? throw new ArgumentNullException(nameof(build));
         SupportsReads = supportsReads;
         SupportsWrites = supportsWrites;
-        SupportedWriteCommands = (supportedWriteCommands ?? []).ToFrozenSet(StringComparer.Ordinal);
+        SupportedWriteCommands = new SnapshotSet<string>(supportedWriteCommands ?? [], StringComparer.Ordinal);
     }
 }
 
@@ -45,7 +45,7 @@ public sealed class GameCommand
 
     public GameCommand(string name, IReadOnlyDictionary<string, string>? arguments = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        Guard.NotBlank(name);
         Name = name;
         Arguments = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(arguments ?? new Dictionary<string, string>(), StringComparer.Ordinal));
     }
