@@ -63,3 +63,11 @@ Bounded live inspection still found the title template loaded and the body templ
 
 Next resumable step: identify the buffered stream's file backing, independently decode the selected Zstandard frame(s) and serialized template entry outside the game, then implement only proven token rules. The final buffered-fill disassembly at 0x32F3570 shows its source at +0x18, but that pointer was not followed before pausing. This is a finite file/format investigation, not a reason to scan all process memory. A complete current-language title/body has not yet been produced, and external reconstruction has not been ruled out. If native formatting later proves necessary, validate ABI, ownership/thread scheduling, output lifetime and the observed state changes before proposing a separate invocation stage.
 
+
+## Resumed preparation: 2026-11-02
+
+The remote research branch still resolved to 1c0c561 and main to 9cdd806. On the resumed Windows machine the installed native binary matched the pinned SHA-256 above; UnityPlayer reported product 6000.3.18f1-custom (96cdb67fb884), file 6000.3.18.9883062. No running FM process was detected during preparation, so no current-save observations were made.
+
+MessageProbe now attempts the body template separately from the title template and includes bounded localization backing type-chain diagnostics. Only previously analyzed +0x18 links are followed, with exact expected RTTI types, a four-link maximum per source, cycle detection and link/root rechecks. The final object's type is reported without interpreting its fields. This prepares the next file-backing investigation without calling stream methods or game formatters. No stream/file claim is established by compilation.
+
+Validation: .NET 10.0.403 Release build, zero warnings/errors; existing synthetic self-test passed. Live capture, stream terminal type, backing file, external template decompression and final parameter formatting remain unverified. The next user action is only to launch FM and load a save; no specific UI page is required. Keep capture JSON outside the repository. No game installation changes or remote push were performed.

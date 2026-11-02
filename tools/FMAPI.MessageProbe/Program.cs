@@ -154,13 +154,14 @@ sealed class Probe : IDisposable
             messages.Add(new {idCandidate=BitConverter.ToInt32(fields,8),dateRaw=BitConverter.ToUInt32(fields),date=GameDate.Decode(BitConverter.ToUInt32(fields)),nativeType=type,title=(string?)null,body=(string?)null});
             if(!Read(item+0x88,16).SequenceEqual(fields))throw new InvalidOperationException("Message changed");
         }
-        object? template=welcome?ReadWelcomeTemplate():null;
+        object? template=welcome?ReadWelcomeTemplate(0xABDAF):null;
+        object? bodyTemplate=welcome?ReadWelcomeTemplate(0xA2A90):null;
+        object? backing=welcome?ReadLocalizationBacking():null;
         if(Pointer(moduleBase+0x56F3008)!=root || !Read(root,0x30).SequenceEqual(rootHeader) || Pointer(begin)!=owner || Pointer(owner+0x350)!=inbox || !Read(inbox,24).SequenceEqual(inboxHeader) || (take>0 && !Read(first,take*8).SequenceEqual(pointers)))throw new InvalidOperationException("Inbox changed");
-        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
+        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,welcomeBodyTemplate=bodyTemplate,localizationBacking=backing,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
     }
-    object ReadWelcomeTemplate()
+    object ReadWelcomeTemplate(uint id)
     {
-        const uint id=0xABDAF;
         var root=Pointer(moduleBase+0x56F1C28);var impl=Pointer(root+8);var index=Read(impl+0x68,24);
         var start=BitConverter.ToUInt64(index);var count=Bounds.Count(start,BitConverter.ToUInt64(index,8),BitConverter.ToUInt64(index,16),16,2000000);
         int language=BitConverter.ToInt32(Read(impl+0x12C,4));int lo=0,hi=count;
@@ -184,6 +185,32 @@ sealed class Probe : IDisposable
         }
         if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,24).SequenceEqual(header) || Pointer(vb)!=variantObject || !Read(variantObject,24).SequenceEqual(partsHeader))throw new InvalidOperationException("Localization changed");
         return new {status="template-only",templateId=id,language,segments,parametersResolved=false};
+    }
+    object ReadLocalizationBacking()
+    {
+        var root=Pointer(moduleBase+0x56F1C28);var impl=Pointer(root+8);
+        string[] expected={".?AVSEGMENT_INPUT_STREAM@sicore@@",".?AVZSTD_SEEKABLE_INPUT_STREAM@sicompression@@",".?AVSEGMENT_INPUT_STREAM@sicore@@",".?AVBUFFERED_INPUT_STREAM@sicore@@"};
+        var sources=new List<object>();
+        foreach(ulong slot in new ulong[]{0xD8,0xE0})
+        {
+            var start=Pointer(impl+slot);var current=start;var seen=new HashSet<ulong>();
+            var types=new List<string>();var links=new List<(ulong Address,ulong Target)>();
+            string stop="null source";
+            for(int depth=0;current!=0 && depth<=expected.Length;depth++)
+            {
+                if(!seen.Add(current))throw new InvalidDataException("Localization stream cycle");
+                var type=TypeName(current);types.Add(type);
+                if(depth==expected.Length){stop="terminal type observed; layout not followed";break;}
+                if(type!=expected[depth]){stop="unexpected type; layout not followed";break;}
+                var next=Pointer(current+0x18);links.Add((current+0x18,next));current=next;
+                stop="null backing";
+            }
+            foreach(var link in links)if(Pointer(link.Address)!=link.Target)throw new InvalidOperationException("Localization stream changed");
+            if(Pointer(impl+slot)!=start)throw new InvalidOperationException("Localization source changed");
+            sources.Add(new {slotOffset=slot,types,stop});
+        }
+        if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl)throw new InvalidOperationException("Localization root changed");
+        return new {status="type-chain-only",sources,filePathResolved=false};
     }
     public void Dispose(){Native.CloseHandle(handle);process.Dispose();pe.Dispose();}
 }
