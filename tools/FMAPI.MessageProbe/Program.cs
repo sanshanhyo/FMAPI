@@ -146,19 +146,21 @@ sealed class Probe : IDisposable
         var first=BitConverter.ToUInt64(inboxHeader);
         var count=Bounds.Count(first,BitConverter.ToUInt64(inboxHeader,8),BitConverter.ToUInt64(inboxHeader,16),8,32768);
         var take=Math.Min(count,32);var pointers=take==0?Array.Empty<byte>():Read(first,take*8);
-        var messages=new List<object>();bool welcome=false;
+        var messages=new List<object>();bool welcome=false;ulong welcomeObject=0;
         for(int i=0;i<take;i++)
         {
             var item=BitConverter.ToUInt64(pointers,i*8);var type=TypeName(item);var fields=Read(item+0x88,16);
             welcome |= type==".?AVWELCOME_TO_THE_CLUB_NEWS@@";
+            if(type==".?AVWELCOME_TO_THE_CLUB_NEWS@@" && welcomeObject==0)welcomeObject=item;
             messages.Add(new {idCandidate=BitConverter.ToInt32(fields,8),dateRaw=BitConverter.ToUInt32(fields),date=GameDate.Decode(BitConverter.ToUInt32(fields)),nativeType=type,title=(string?)null,body=(string?)null});
             if(!Read(item+0x88,16).SequenceEqual(fields))throw new InvalidOperationException("Message changed");
         }
+        object? relations=welcome?ReadWelcomeRelations(welcomeObject,owner+0x440):null;
         object? template=welcome?ReadWelcomeTemplate(0xABDAF):null;
         object? bodyTemplate=welcome?ReadWelcomeTemplate(0xA2A90):null;
         object? backing=welcome?ReadLocalizationBacking():null;
         if(Pointer(moduleBase+0x56F3008)!=root || !Read(root,0x30).SequenceEqual(rootHeader) || Pointer(begin)!=owner || Pointer(owner+0x350)!=inbox || !Read(inbox,24).SequenceEqual(inboxHeader) || (take>0 && !Read(first,take*8).SequenceEqual(pointers)))throw new InvalidOperationException("Inbox changed");
-        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,welcomeBodyTemplate=bodyTemplate,localizationBacking=backing,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
+        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,welcomeBodyTemplate=bodyTemplate,localizationBacking=backing,welcomeRelationCandidates=relations,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
     }
     object ReadWelcomeTemplate(uint id)
     {
@@ -192,6 +194,55 @@ sealed class Probe : IDisposable
         }
         if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,32).SequenceEqual(header) || Pointer(vb)!=variantObject || !Read(variantObject,24).SequenceEqual(partsHeader))throw new InvalidOperationException("Localization changed");
         return new {status="template-only",templateId=id,language,segments,serializedOffsetCandidate,backingSelectorCandidate,parametersResolved=false};
+    }
+    object ReadWelcomeRelations(ulong message,ulong ownerPerson)
+    {
+        var otherPerson=Pointer(message+0x78);var team=Pointer(message+0xA0);
+        var otherType=otherPerson==0?null:TypeName(otherPerson);
+        var teamType=team==0?null:TypeName(team);
+        string? clubType=null,shortNameCandidate=null;
+        ulong club=0,name=0;
+        if(teamType==".?AVTEAM@db@@")
+        {
+            club=Pointer(team+0x30);clubType=club==0?null:TypeName(club);
+            if(clubType==".?AVCLUB@db@@")
+            {
+                name=Pointer(club+0xC8);
+                if(name!=0){var length=BitConverter.ToInt32(Read(name,4));if(length<0 || length>256)throw new InvalidDataException("Club candidate name bounds");shortNameCandidate=Text.Decode(Read(name,length+5));}
+            }
+        }
+        var personDisplacement=BitConverter.ToInt32(Read(ownerPerson-4,4));
+        if(personDisplacement<0 || personDisplacement>4096)throw new InvalidDataException("Owner PERSON displacement rejected");
+        var adjustedPerson=ownerPerson-(uint)personDisplacement;
+        var ownerStart=adjustedPerson-0x440;var vbtable=Pointer(ownerStart);
+        if(vbtable!=moduleBase+0x4CC086C)throw new InvalidDataException("Owner name vbtable mismatch");
+        var virtualOffset=BitConverter.ToInt32(Read(vbtable+8,4));
+        if(virtualOffset<0 || virtualOffset>8192)throw new InvalidDataException("Owner name virtual offset rejected");
+        var ownerNameBase=ownerStart+(uint)virtualOffset;
+        var ownerNameRecords=new List<object>();
+        foreach(ulong field in new ulong[]{0x28,0x30,0x38})
+        {
+            var record=Pointer(ownerNameBase+field);
+            if(record==0){ownerNameRecords.Add(new {fieldOffset=field,status="null"});continue;}
+            var firstWord=Pointer(record);
+            ulong? firstWordModuleRva=firstWord>=moduleBase && firstWord-moduleBase<(ulong)pe.PEHeaders.PEHeader!.SizeOfImage?firstWord-moduleBase:null;
+            string? textCandidate=null;
+            if(firstWordModuleRva==null && firstWord>=65536 && firstWord<0x00007FFFFFFFFFFFUL)
+            {
+                var length=BitConverter.ToInt32(Read(firstWord,4));
+                if(length>=0 && length<=256)textCandidate=Text.Decode(Read(firstWord,length+5));
+            }
+            if(Pointer(ownerNameBase+field)!=record || Pointer(record)!=firstWord)throw new InvalidOperationException("Owner name candidate changed");
+            ownerNameRecords.Add(new {fieldOffset=field,status="candidate-only",firstWordModuleRva,textCandidate});
+        }
+        var teamNameKindCandidate=team==0?(byte?)null:Read(team+0x28,1)[0];
+        var service=Pointer(moduleBase+0x5702CB0);var serviceType=TypeName(service);
+        var serviceVtable=Pointer(service);
+        if(serviceVtable<moduleBase || serviceVtable-moduleBase>(ulong)pe.PEHeaders.PEHeader!.SizeOfImage)throw new InvalidDataException("Person text service vtable rejected");
+        var dispatch=Pointer(serviceVtable+0x30);
+        if(dispatch<moduleBase || dispatch-moduleBase>int.MaxValue)throw new InvalidDataException("Person text dispatch rejected");
+        if(Pointer(message+0x78)!=otherPerson || Pointer(message+0xA0)!=team || (club!=0 && Pointer(team+0x30)!=club) || (name!=0 && Pointer(club+0xC8)!=name) || Pointer(moduleBase+0x5702CB0)!=service || Pointer(service)!=serviceVtable || BitConverter.ToInt32(Read(ownerPerson-4,4))!=personDisplacement || Pointer(ownerStart)!=vbtable || BitConverter.ToInt32(Read(vbtable+8,4))!=virtualOffset)throw new InvalidOperationException("Welcome relation changed");
+        return new {status="candidate-only",person2Type=otherType,person2EqualsOwnerPerson=otherPerson==ownerPerson,teamType,clubType,clubShortNameCandidate=shortNameCandidate,teamNameKindCandidate,ownerNameRecords,personTextServiceType=serviceType,personDispatchRva=dispatch-moduleBase,contextPerson1Confirmed=false,tokenRulesConfirmed=false};
     }
     object ReadLocalizationBacking()
     {
