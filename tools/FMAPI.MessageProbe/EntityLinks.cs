@@ -69,9 +69,15 @@ sealed partial class Probe
         if(Pointer(moduleBase+0x5703738)!=table || Read(table+0x5C,1)[0]!=flags || ((flags&1)!=0 && Read(table+0xA0,1)[0]!=dirty) || ((flags&1)==0 && Pointer(table+0x80)!=indirect) || !Read(vector,24).SequenceEqual(bounds))throw new InvalidOperationException("UID index changed");
         return new {status="partial",scope="explicit requested UIDs; no all-registry scan",requested=requested.Length,records,clubMembershipVerifiedHere=false};
     }
-    public object CaptureEntityLinks(uint[]? requestedUids=null)
+    public object CaptureEntityLinks(uint[]? requestedUids=null,bool selectionOnly=false)
     {
         budget=65536;
+        const string gameAssemblyHash="820D6618ACAFAC7DFFC1EF3B489582EDDB84B0343D4F34D55FFF9FB70881E00A";
+        var assembly=process.Modules.Cast<System.Diagnostics.ProcessModule>().Single(module=>string.Equals(module.ModuleName,"GameAssembly.dll",StringComparison.OrdinalIgnoreCase));
+        using(var stream=File.OpenRead(assembly.FileName))if(Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))!=gameAssemblyHash)throw new InvalidDataException("Unsupported GameAssembly selection-name mapping profile");
+        var selected=Pointer(moduleBase+0x56F32C8);var selectedType=CandidateType(selected);
+        var selectedIdentity=selected==0?Array.Empty<byte>():Read(selected,16);
+        object? activeManager=null;int selectionMatches=0;
         var root=Pointer(moduleBase+0x56F3008);var header=Read(root,0x30);
         if(BitConverter.ToUInt64(header)!=moduleBase+0x4E2D678 || TypeName(root)!=".?AVHUMAN_NON_PLAYER_MANAGER@@")throw new InvalidDataException("Human manager root mismatch");
         var begin=BitConverter.ToUInt64(header,0x18);
@@ -98,11 +104,21 @@ sealed partial class Probe
                 if(payloadType==".?AVTEAM@db@@"){linkedClub=Pointer(payload+0x30);payloadField30Type=CandidateType(linkedClub);if(payloadField30Type==".?AVCLUB@db@@")clubUidCandidate=BitConverter.ToUInt32(Read(linkedClub+0x0C,4));}
             }
             var flag=Read(owner+0x422,1)[0];
+            bool isSelected=selected!=0 && selected==person && selectedType==".?AVHUMAN_NON_PLAYER@db@@";
+            if(isSelected)
+            {
+                selectionMatches++;
+                if(!selectedIdentity.AsSpan(8,8).SequenceEqual(identity))throw new InvalidOperationException("Selected manager identity changed");
+                activeManager=new {uid=BitConverter.ToUInt32(identity,4),clubUid=clubUidCandidate,contractType,contractKind,source="native GameCurrentManager (GCuM) selection global",activeVerified=true,atomicSnapshot=false};
+            }
             if(!Read(person+8,8).SequenceEqual(identity) || Pointer(virtualBase+0x80)!=contract || (payload!=0 && Pointer(contract+0x10)!=payload) || (linkedClub!=0 && Pointer(payload+0x30)!=linkedClub) || (clubUidCandidate!=null && BitConverter.ToUInt32(Read(linkedClub+0x0C,4))!=clubUidCandidate) || (contractKind!=null && Read(contract+0x26,1)[0]!=contractKind))throw new InvalidOperationException("Manager entity changed");
-            managers.Add(new {personReferenceCandidate=BitConverter.ToUInt32(identity),personUidCandidate=BitConverter.ToUInt32(identity,4),flag422Raw=flag,contractType,contractKind,kindMethodRva,payloadType,payloadField30Type,clubUidCandidate,activeVerified=false});
+            managers.Add(new {personReferenceCandidate=BitConverter.ToUInt32(identity),personUidCandidate=BitConverter.ToUInt32(identity,4),flag422Raw=flag,contractType,contractKind,kindMethodRva,payloadType,payloadField30Type,clubUidCandidate,activeVerified=isSelected});
         }
         if(Pointer(moduleBase+0x56F3008)!=root || !Read(root,0x30).SequenceEqual(header) || (count>0 && !Read(begin,count*8).SequenceEqual(entries)))throw new InvalidOperationException("Human manager collection changed");
-        var positions=requestedUids==null?SamplePlayerPositions():ReadRequestedPositions(requestedUids);
-        return new {status="partial",positions,binarySha256=Hash,processId=process.Id,processStartedAt=started.ToUniversalTime(),atomicSnapshot=false,managerCandidates=managers,activeManager=(object?)null,unsupported=new[]{"active user selection","named outfield positions","cross-save UID persistence"}};
+        if(selectionMatches>1)throw new InvalidDataException("Duplicate selected manager ownership");
+        if(Pointer(moduleBase+0x56F32C8)!=selected || (selected!=0 && !Read(selected,16).SequenceEqual(selectedIdentity)))throw new InvalidOperationException("Selected manager changed");
+        object positions=selectionOnly?new {status="not-requested"}:requestedUids==null?SamplePlayerPositions():ReadRequestedPositions(requestedUids);
+        var selection=new {status=selectionMatches==1?"available":"unavailable",sourcePropertyKey="GCuM",selectedType,matchedHumanOwner=selectionMatches==1,reason=selectionMatches==1?(string?)null:selected==0?"no native current-manager selection":"selected record not matched to validated human-owner collection"};
+        return new {status="partial",selection,positions,binarySha256=Hash,gameAssemblySha256=gameAssemblyHash,processId=process.Id,processStartedAt=started.ToUniversalTime(),atomicSnapshot=false,managerCandidates=managers,activeManager,unsupported=new[]{"cross-session active-selection stability","named outfield positions","cross-save UID persistence"}};
     }
 }
