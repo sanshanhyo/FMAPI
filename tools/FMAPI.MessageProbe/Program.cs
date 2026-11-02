@@ -29,12 +29,19 @@ try
         Console.WriteLine("PASS: vector/empty bounds, strict UTF-8, packed dates, invalid pointers and failed reads");
         return 0;
     }
-    if(args.Length is not (2 or 3) || args.Length==3 && args[2]!="--verify-repeat") throw new ArgumentException("Usage: FMAPI.MessageProbe <pid> <game_plugin.dll path> [--verify-repeat]; or --self-test");
+    if(args.Length is not (2 or 3 or 4) || args.Length>=3 && args[2] is not ("--verify-repeat" or "--entity-links") || args.Length==4 && args[2]!="--entity-links") throw new ArgumentException("Usage: FMAPI.MessageProbe <pid> <game_plugin.dll path> [--verify-repeat | --entity-links [private-uid-array.json]]; or --self-test");
     if(!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Windows only");
     using var probe = new Probe(int.Parse(args[0]), Path.GetFullPath(args[1]));
-    var result=probe.Capture();
-    if(args.Length==3 && JsonSerializer.Serialize(result)!=JsonSerializer.Serialize(probe.Capture()))throw new InvalidOperationException("Repeated capture differs; no stable result emitted");
-    Console.WriteLine(JsonSerializer.Serialize(new {repeatVerified=args.Length==3,result},new JsonSerializerOptions{WriteIndented=true}));
+    uint[]? requestedUids=null;
+    if(args.Length==4)
+    {
+        var info=new FileInfo(args[3]);if(info.Length>4096)throw new InvalidDataException("UID input size limit");
+        requestedUids=JsonSerializer.Deserialize<uint[]>(File.ReadAllText(info.FullName));
+        if(requestedUids==null || requestedUids.Length is <1 or >32 || requestedUids.Any(id=>id==0 || id>int.MaxValue) || requestedUids.Distinct().Count()!=requestedUids.Length)throw new InvalidDataException("Requires 1-32 distinct positive signed-int UIDs");
+    }
+    var result=args.Length>=3 && args[2]=="--entity-links"?probe.CaptureEntityLinks(requestedUids):probe.Capture();
+    if(args.Length==3 && args[2]=="--verify-repeat" && JsonSerializer.Serialize(result)!=JsonSerializer.Serialize(probe.Capture()))throw new InvalidOperationException("Repeated capture differs; no stable result emitted");
+    Console.WriteLine(JsonSerializer.Serialize(new {repeatVerified=args.Length==3 && args[2]=="--verify-repeat",result},new JsonSerializerOptions{WriteIndented=true}));
     return 0;
 }
 catch(Exception error)
@@ -81,7 +88,7 @@ static class SafeRead
         return data;
     }
 }
-sealed class Probe : IDisposable
+sealed partial class Probe : IDisposable
 {
     const string Hash="BC940E472418FC5C214208D7CF30FECF600F689B6F9D71C11BA19A2DF0FE057F";
     readonly Process process;
