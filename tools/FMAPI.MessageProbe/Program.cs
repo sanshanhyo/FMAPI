@@ -160,7 +160,7 @@ sealed class Probe : IDisposable
         object? bodyTemplate=welcome?ReadWelcomeTemplate(0xA2A90):null;
         object? backing=welcome?ReadLocalizationBacking():null;
         if(Pointer(moduleBase+0x56F3008)!=root || !Read(root,0x30).SequenceEqual(rootHeader) || Pointer(begin)!=owner || Pointer(owner+0x350)!=inbox || !Read(inbox,24).SequenceEqual(inboxHeader) || (take>0 && !Read(first,take*8).SequenceEqual(pointers)))throw new InvalidOperationException("Inbox changed");
-        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,welcomeBodyTemplate=bodyTemplate,localizationBacking=backing,welcomeRelationCandidates=relations,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
+        return new {status="partial",scope="single-human-manager-associated-messages",count,returned=take,atomicSnapshot=false,binarySha256=Hash,idScope="observed object field; cross-session stability unverified",messages,welcomeTitleTemplate=template,welcomeBodyTemplate=bodyTemplate,localizationBacking=backing,welcomeRelationCandidates=relations,unsupported=new[]{"formatted title","body","active owner in multiplayer"}};
     }
     object ReadWelcomeTemplate(uint id)
     {
@@ -194,6 +194,27 @@ sealed class Probe : IDisposable
         }
         if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,32).SequenceEqual(header) || Pointer(vb)!=variantObject || !Read(variantObject,24).SequenceEqual(partsHeader))throw new InvalidOperationException("Localization changed");
         return new {status="template-only",templateId=id,language,segments,serializedOffsetCandidate,backingSelectorCandidate,parametersResolved=false};
+    }
+    bool NameOverridePresent(uint type,uint identity)
+    {
+        var count=Pointer(moduleBase+0x5704010);
+        if(count==0)return false;
+        if(count>1000000)throw new InvalidDataException("Name override count limit");
+        var head=Pointer(moduleBase+0x5704008);var node=Pointer(head+8);
+        int target=unchecked((int)((type<<24)|(identity&0x7FFFFF)));var seen=new HashSet<ulong>();
+        bool found=false,finished=false;
+        for(int step=0;step<32;step++)
+        {
+            if(!seen.Add(node))throw new InvalidDataException("Override tree cycle");
+            var header=Read(node,0x24);
+            if(header[0x19]!=0){finished=true;break;}
+            var key=BitConverter.ToInt32(header,0x20);
+            if(key==target){found=true;finished=true;break;}
+            node=BitConverter.ToUInt64(header,key<target?0x10:0);
+        }
+        if(!finished)throw new InvalidDataException("Override tree depth limit");
+        if(Pointer(moduleBase+0x5704010)!=count || Pointer(moduleBase+0x5704008)!=head)throw new InvalidOperationException("Override root changed");
+        return found;
     }
     object ReadWelcomeRelations(ulong message,ulong ownerPerson)
     {
@@ -235,14 +256,64 @@ sealed class Probe : IDisposable
             if(Pointer(ownerNameBase+field)!=record || Pointer(record)!=firstWord)throw new InvalidOperationException("Owner name candidate changed");
             ownerNameRecords.Add(new {fieldOffset=field,status="candidate-only",firstWordModuleRva,textCandidate});
         }
+        var teamShortOverridePointer=team==0?0:Pointer(team+0x20);
+        string? teamShortOverrideCandidate=null;
+        if(teamShortOverridePointer!=0)
+        {
+            var length=BitConverter.ToInt32(Read(teamShortOverridePointer,4));
+            if(length<0 || length>256)throw new InvalidDataException("Team override text limit");
+            teamShortOverrideCandidate=Text.Decode(Read(teamShortOverridePointer,length+5));
+        }
+        var nameOverridePresence=new {owner=NameOverridePresent(1,BitConverter.ToUInt32(Read(ownerPerson+8,4))),team=team!=0 && NameOverridePresent(24,BitConverter.ToUInt32(Read(team+8,4))),club=club!=0 && NameOverridePresent(3,BitConverter.ToUInt32(Read(club+8,4)))};
+        var clubAlternateNameRecords=new List<object>();byte? clubStandaloneFlag=null;
+        if(club!=0)
+        {
+            clubStandaloneFlag=Read(club+0xBA,1)[0];var alternateRoot=Pointer(club+0xD0);
+            if(alternateRoot!=0)
+            {
+                var header=Read(alternateRoot,24);var begin=BitConverter.ToUInt64(header);
+                var count=Bounds.Count(begin,BitConverter.ToUInt64(header,8),BitConverter.ToUInt64(header,16),8,512);
+                for(int i=0;i<count;i++)
+                {
+                    var entry=Pointer(begin+(ulong)i*8);var meta=Read(entry+8,3);
+                    var kind=BitConverter.ToUInt16(meta);var language=unchecked((sbyte)meta[2]);
+                    if(kind is 0x18 or 0x19)
+                    {
+                        var textPointer=Pointer(entry);var length=BitConverter.ToInt32(Read(textPointer,4));
+                        if(length<0 || length>256)throw new InvalidDataException("Alternate club text limit");
+                        var text=Text.Decode(Read(textPointer,length+5));clubAlternateNameRecords.Add(new {kind,language,text});
+                    }
+                    else clubAlternateNameRecords.Add(new {kind,language,text=(string?)null});
+                }
+                if(Pointer(club+0xD0)!=alternateRoot || !Read(alternateRoot,24).SequenceEqual(header))throw new InvalidOperationException("Club alternate names changed");
+            }
+        }
+        var personIdentity=BitConverter.ToUInt32(Read(ownerPerson+8,4))&0x7FFFFF;
+        var personManager=Pointer(moduleBase+0x5703738);var personMode=Read(moduleBase+0x5703DE0,1)[0];
+        var registryVector=personMode==0?personManager+0x60:Pointer(personManager+0x80);
+        var registryBounds=Read(registryVector,16);var registryBegin=BitConverter.ToUInt64(registryBounds);var registryEnd=BitConverter.ToUInt64(registryBounds,8);
+        if(registryEnd<registryBegin || (registryEnd-registryBegin)%8!=0 || registryEnd-registryBegin>8000000UL*8)throw new InvalidDataException("Person registry bounds rejected");
+        var ownerLookupConfirmed=personIdentity<(registryEnd-registryBegin)/8 && Pointer(registryBegin+(ulong)personIdentity*8)==ownerPerson;
+        if(Pointer(moduleBase+0x5703738)!=personManager || Read(moduleBase+0x5703DE0,1)[0]!=personMode || !Read(registryVector,16).SequenceEqual(registryBounds))throw new InvalidOperationException("Person registry changed");
+        var teamSpecialReplacementCase=team!=0 && BitConverter.ToUInt32(Read(team+0x0C,4))==0x23716;
         var teamNameKindCandidate=team==0?(byte?)null:Read(team+0x28,1)[0];
+        var formatterLabels=new List<object>();
+        foreach(uint slot in new uint[]{0x570EE18,0x570EE20,0x570EDB8,0x570EDC0,0x570EDC8,0x570EDD0,0x570EDD8,0x570EDE0,0x570EDE8,0x570EDF0,0x570EDF8,0x57658E8,0x57658F0,0x57658F8,0x5765900,0x5711A00})
+        {
+            var wrapper=Pointer(moduleBase+slot);var label=Pointer(wrapper);
+            if(label==0){formatterLabels.Add(new {slotRva=slot,text=(string?)null});continue;}
+            var length=BitConverter.ToInt32(Read(label,4));if(length<0 || length>128)throw new InvalidDataException("Formatter label bound");
+            var text=Text.Decode(Read(label,length+5));
+            if(Pointer(moduleBase+slot)!=wrapper || Pointer(wrapper)!=label)throw new InvalidOperationException("Formatter label changed");
+            formatterLabels.Add(new {slotRva=slot,text});
+        }
         var service=Pointer(moduleBase+0x5702CB0);var serviceType=TypeName(service);
         var serviceVtable=Pointer(service);
         if(serviceVtable<moduleBase || serviceVtable-moduleBase>(ulong)pe.PEHeaders.PEHeader!.SizeOfImage)throw new InvalidDataException("Person text service vtable rejected");
         var dispatch=Pointer(serviceVtable+0x30);
         if(dispatch<moduleBase || dispatch-moduleBase>int.MaxValue)throw new InvalidDataException("Person text dispatch rejected");
         if(Pointer(message+0x78)!=otherPerson || Pointer(message+0xA0)!=team || (club!=0 && Pointer(team+0x30)!=club) || (name!=0 && Pointer(club+0xC8)!=name) || Pointer(moduleBase+0x5702CB0)!=service || Pointer(service)!=serviceVtable || BitConverter.ToInt32(Read(ownerPerson-4,4))!=personDisplacement || Pointer(ownerStart)!=vbtable || BitConverter.ToInt32(Read(vbtable+8,4))!=virtualOffset)throw new InvalidOperationException("Welcome relation changed");
-        return new {status="candidate-only",person2Type=otherType,person2EqualsOwnerPerson=otherPerson==ownerPerson,teamType,clubType,clubShortNameCandidate=shortNameCandidate,teamNameKindCandidate,ownerNameRecords,personTextServiceType=serviceType,personDispatchRva=dispatch-moduleBase,contextPerson1Confirmed=false,tokenRulesConfirmed=false};
+        return new {status="candidate-only",person2Type=otherType,person2EqualsOwnerPerson=otherPerson==ownerPerson,teamType,clubType,clubShortNameCandidate=shortNameCandidate,teamShortOverrideCandidate,nameOverridePresence,clubStandaloneFlag,clubAlternateNameRecords,ownerLookupConfirmed,teamSpecialReplacementCase,teamNameKindCandidate,ownerNameRecords,formatterLabels,personTextServiceType=serviceType,personDispatchRva=dispatch-moduleBase,contextPerson1Confirmed=false,tokenRulesConfirmed=false};
     }
     object ReadLocalizationBacking()
     {
