@@ -170,9 +170,16 @@ sealed class Probe : IDisposable
         var entry=Read(start+(ulong)lo*16,16);
         if(BitConverter.ToUInt32(entry)!=id || BitConverter.ToInt32(entry,4)!=language)return new {status="unavailable",reason="exact language missing"};
         var value=BitConverter.ToUInt64(entry,8);if(value==0)return new {status="unavailable",reason="null template"};
-        var header=Read(value,24);var vb=BitConverter.ToUInt64(header);
+        var header=Read(value,32);
+        var serializedOffsetCandidate=BitConverter.ToUInt32(header,24);
+        var backingSelectorCandidate=header[31];
+        var vb=BitConverter.ToUInt64(header);
         var variants=Bounds.Count(vb,BitConverter.ToUInt64(header,8),BitConverter.ToUInt64(header,16),8,128);
-        if(variants==0)return new {status="unavailable",reason="template not loaded; no game call attempted"};
+        if(variants==0)
+        {
+            if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,32).SequenceEqual(header))throw new InvalidOperationException("Unloaded localization entry changed");
+            return new {status="unavailable",reason="template not loaded; no game call attempted",templateId=id,language,serializedOffsetCandidate,backingSelectorCandidate};
+        }
         if(variants!=1)return new {status="unavailable",reason="multiple variants require selection semantics"};
         var variantObject=Pointer(vb);var partsHeader=Read(variantObject,24);var pb=BitConverter.ToUInt64(partsHeader);
         var parts=Bounds.Count(pb,BitConverter.ToUInt64(partsHeader,8),BitConverter.ToUInt64(partsHeader,16),8,16);
@@ -183,8 +190,8 @@ sealed class Probe : IDisposable
             if(length<0 || length>4096)throw new InvalidDataException("Text length limit");
             segments.Add(Text.Decode(Read(text,length+5)));
         }
-        if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,24).SequenceEqual(header) || Pointer(vb)!=variantObject || !Read(variantObject,24).SequenceEqual(partsHeader))throw new InvalidOperationException("Localization changed");
-        return new {status="template-only",templateId=id,language,segments,parametersResolved=false};
+        if(Pointer(moduleBase+0x56F1C28)!=root || Pointer(root+8)!=impl || !Read(impl+0x68,24).SequenceEqual(index) || BitConverter.ToInt32(Read(impl+0x12C,4))!=language || !Read(value,32).SequenceEqual(header) || Pointer(vb)!=variantObject || !Read(variantObject,24).SequenceEqual(partsHeader))throw new InvalidOperationException("Localization changed");
+        return new {status="template-only",templateId=id,language,segments,serializedOffsetCandidate,backingSelectorCandidate,parametersResolved=false};
     }
     object ReadLocalizationBacking()
     {
