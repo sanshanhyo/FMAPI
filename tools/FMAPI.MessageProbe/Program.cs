@@ -26,7 +26,14 @@ try
         if(reads!=0)throw new Exception("Invalid pointer reached transport");
         try{SafeRead.Exact(65536,8,(_,_)=>new byte[4]);throw new Exception("Short read accepted");}catch(InvalidDataException){}
         try{SafeRead.Exact(65536,8,(_,_)=>throw new IOException("unmapped"));throw new Exception("Failed read accepted");}catch(IOException){}
-        Console.WriteLine("PASS: vector/empty bounds, strict UTF-8, packed dates, invalid pointers and failed reads");
+        PositionFields.SelfTest();
+        Console.WriteLine("PASS: bounds, UTF-8, dates, transport failures; position sides, reserved slot and threshold boundaries");
+        return 0;
+    }
+    if(args.Length==3 && args[0]=="--decode-position-capture")
+    {
+        PositionCaptureDecoder.Write(args[1],args[2]);
+        Console.WriteLine("Private named-position result written from existing capture; no process read");
         return 0;
     }
     if(args.Length is not (2 or 3 or 4) || args.Length>=3 && args[2] is not ("--verify-repeat" or "--entity-links" or "--manager-selection") || args.Length==4 && args[2]!="--entity-links") throw new ArgumentException("Usage: FMAPI.MessageProbe <pid> <game_plugin.dll path> [--verify-repeat | --entity-links [private-uid-array.json] | --manager-selection]; or --self-test");

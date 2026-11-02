@@ -54,3 +54,34 @@ The conversion arithmetic is established by getter 0x16360E0. All 27 explicitly 
 - `docs/research/manager-player-links-checkpoint.md`: data provenance, validation limits and historical state.
 
 Use --manager-selection for a minimal selection/employment capture without sampling positions or localization. Use --entity-links followed by a private UID-array file for at most 32 targeted player UID lookups. Keep output and UID arrays outside the repository. No remote push is part of this work.
+
+## Named familiarity fields and natural-position mask
+
+The metadata PositionMask enum was independently decoded from the pinned v39 field/default tables. Its metadata file SHA-256 is A380792F33BA4EB048FA2FFEBC6C504B001F85C76E4128E4D41CA24D7B017C4C. The native pure mask builder is RVA 0x499AEB0; its lookup table is RVA 0x4D36ACC. Actual-player virtual +0x478 is RVA 0x15E7970, which supplies the structure at player +0x148 to that builder.
+
+The builder tests structure +8 (player +0x150) for GK, then loops over structure +0x0A..+0x16 (player +0x152..+0x15E). It ORs the matching named mask bit when a familiarity is >= the supplied threshold. Structure +9/player +0x151 is skipped. The table's skipped entry corresponds to metadata SweeperCentreNotInUse; the diagnostic retains that byte only as unusedSlot151Raw.
+
+| Player offset | Code | Native enum name | Mask bit |
+|---|---|---|---|
+| 0x150 | GK | Goalkeeper | 0x1 |
+| 0x152 | DL | DefenderLeft | 0x8 |
+| 0x153 | DC | DefenderCentre | 0x10 |
+| 0x154 | DR | DefenderRight | 0x4 |
+| 0x155 | DM | DefensiveMidfielderCentre | 0x80 |
+| 0x156 | ML | MidfielderLeft | 0x200 |
+| 0x157 | MC | MidfielderCentre | 0x400 |
+| 0x158 | MR | MidfielderRight | 0x100 |
+| 0x159 | AML | AttackingMidfielderLeft | 0x1000 |
+| 0x15A | AMC | AttackingMidfielderCentre | 0x2000 |
+| 0x15B | AMR | AttackingMidfielderRight | 0x800 |
+| 0x15C | ST | AttackerCentre | 0x4000 |
+| 0x15D | WBL | WingBackLeft | 0x40 |
+| 0x15E | WBR | WingBackRight | 0x20 |
+
+The order is recovered from the native table, not guessed from common football abbreviations. Left/right are especially easy to reverse. Other enum members such as AttackerRight/AttackerLeft have no corresponding familiarity in this analyzed loop and are not fabricated as zero-rated extra fields.
+
+NaturalPositionMask's metadata literal index 13549 is registered in GameAssembly as key 0x62704D52 at RVA 0x53A410..0x53A481. Native property dispatch 0x521540 routes that key to underlying Pnps (0x506E7073) at 0x52A15C. The player dispatch path at 0x1BCA89B calls virtual +0x478 with threshold 0x12 (18). The research decoder reproduces that route's natural mask using >=18; it does not conflate it with the separate goalkeeper business threshold >=15.
+
+`PositionFields.cs` is original internal probe-only decoding code. Its synthetic checks cover a GK + left-defender mask, a high unused slot that must not emit a bit, the 17/18 natural boundary, the 14/15 goalkeeper boundary, and malformed block size/range. A separate original `tools/research/position_layout_probe.py` reads only the pinned native lookup table and metadata enum, without any process access, and recovered all 14 name/bit/offset mappings. Its output agreed with the C# decoder.
+
+The previously captured 27 complete UID-linked blocks were decoded offline through `--decode-position-capture`; all produced 14 named familiarities and nonempty natural masks, and their goalkeeper predicates agreed with the prior raw result. This is interpretation of measured bytes under the proven layout, not a second measurement or a UI comparison. The original capture is preserved. The decoder's interpretation profile does not retroactively assert that all interpretation fingerprints were recorded in older capture headers.
