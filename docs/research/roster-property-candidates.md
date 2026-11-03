@@ -1,0 +1,9 @@
+# Roster property candidates, static-only checkpoint
+
+Metadata profile SHA256 A380792F33BA4EB048FA2FFEBC6C504B001F85C76E4128E4D41CA24D7B017C4C, signature/version 0xFAB11BAF/39. The literal index is a 4-byte boundary-offset table (section0), not 8-byte length/index records. Adjacent offsets bound strings in section1; GameCurrentManager literal9070 was used as a known control. No save/process data is involved.
+
+Candidate literal IDs: AvailableFirstTeamPlayers3362, FirstTeamPlayers8681, PlayerTeams15141, PreviousMeetingsTeamFixtureList15501. These names do not establish a roster or next-fixture API. AvailableFirstTeamPlayers may be availability-filtered; previous-meetings fixtures are not future schedule entries.
+
+GameAssembly profile SHA256 820D6618ACAFAC7DFFC1EF3B489582EDDB84B0343D4F34D55FFF9FB70881E00A. A slot extrapolation from the known GameCurrentManager slot yields 0x333A160 for FirstTeamPlayers. It remains a candidate mapping, not independently decoded registration evidence. Static displacement candidates occur at 0xC776F (containing function0xC4FF0) and 0x1CA463F (function0x1CA3AA0). Instruction-boundary decoding at0x1CA463C confirms a load from that slot followed by managed initialization and an assignment to a static object member+0x158, then helper0x1CA2530. This does not show a native business key or a team-owned player vector.
+
+No reference was found for the extrapolated PlayerTeams/PreviousMeetings slots by this limited xref method; absence of this pattern is not proof of absent functionality. Next: independently validate literal-slot mapping and inspect the binding helper/registration chain. Do not follow member+0x158 as a native TEAM field. No live read or new roster/fixture field was performed in this round. Existing player contract/team/club relation remains the supported narrow join; complete membership and collection coverage remain missing.
