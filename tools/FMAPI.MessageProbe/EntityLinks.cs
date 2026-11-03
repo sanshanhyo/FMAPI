@@ -64,10 +64,29 @@ sealed partial class Probe
             var identities=Read(person+8,8);if(BitConverter.ToUInt32(identities,4)!=uid)throw new InvalidOperationException("UID changed");
             var slots=Read(player+0x150,15);if(slots.Any(value=>value>20))throw new InvalidDataException("Position familiarity range");
             if(!Read(person+8,8).SequenceEqual(identities) || !Read(player+0x150,15).SequenceEqual(slots))throw new InvalidOperationException("Requested player changed");
-            records.Add(new {uid,status="available",uidMatched=true,personReferenceRaw=BitConverter.ToUInt32(identities),goalkeeperFamiliarity=slots[0],businessRuleIsGoalkeeper=slots[0]>=15,otherPositionSlotsRaw=slots.Skip(1).Select(value=>(int)value).ToArray(),positionFields=PositionFields.Decode(slots),positionNamesVerified=true});
+            var employment=ReadPlayerEmployment(person,player);
+            if(!Read(person+8,8).SequenceEqual(identities) || Pointer(player)!=moduleBase+0x4D27228)throw new InvalidOperationException("Player identity changed after employment read");
+            records.Add(new {uid,status="available",uidMatched=true,personReferenceRaw=BitConverter.ToUInt32(identities),goalkeeperFamiliarity=slots[0],businessRuleIsGoalkeeper=slots[0]>=15,otherPositionSlotsRaw=slots.Skip(1).Select(value=>(int)value).ToArray(),positionFields=PositionFields.Decode(slots),positionNamesVerified=true,employment});
         }
         if(Pointer(moduleBase+0x5703738)!=table || Read(table+0x5C,1)[0]!=flags || ((flags&1)!=0 && Read(table+0xA0,1)[0]!=dirty) || ((flags&1)==0 && Pointer(table+0x80)!=indirect) || !Read(vector,24).SequenceEqual(bounds))throw new InvalidOperationException("UID index changed");
         return new {status="partial",scope="explicit requested UIDs; no all-registry scan",requested=requested.Length,records,clubMembershipVerifiedHere=false};
+    }
+    object ReadPlayerEmployment(ulong person,ulong player)
+    {
+        if(Pointer(Pointer(person)+0x3C0)!=moduleBase+0x1634E50)throw new InvalidDataException("Unsupported player employment getter");
+        var vbtable=Pointer(player+8);
+        if(vbtable<moduleBase || vbtable-moduleBase>(ulong)file.Length-12)throw new InvalidDataException("Player employment vbtable range");
+        int offset=BitConverter.ToInt32(Read(vbtable+8,4));
+        if(offset<0 || offset>8192)throw new InvalidDataException("Player employment virtual offset");
+        var slot=player+0x88+(uint)offset;var contract=Pointer(slot);var contractType=CandidateType(contract);
+        ulong team=0,club=0;string? teamType=null,clubType=null;uint? clubUid=null;byte? kind=null;
+        if(contractType==".?AVFULL_CONTRACT@db@@")
+        {
+            kind=Read(contract+0x26,1)[0];team=Pointer(contract+0x10);teamType=CandidateType(team);
+            if(teamType==".?AVTEAM@db@@"){club=Pointer(team+0x30);clubType=CandidateType(club);if(clubType==".?AVCLUB@db@@")clubUid=BitConverter.ToUInt32(Read(club+0x0C,4));}
+        }
+        if(Pointer(player+8)!=vbtable || BitConverter.ToInt32(Read(vbtable+8,4))!=offset || Pointer(slot)!=contract || (team!=0 && Pointer(contract+0x10)!=team) || (club!=0 && Pointer(team+0x30)!=club) || (clubUid!=null && BitConverter.ToUInt32(Read(club+0x0C,4))!=clubUid))throw new InvalidOperationException("Player employment changed");
+        return new {status=clubUid!=null?"available":"partial",contractType,kind,teamType,clubType,clubUid,source="pinned ACTUAL_PLAYER PERSON virtual+3C0 getter 1634E50",atomicSnapshot=false};
     }
     public object CaptureEntityLinks(uint[]? requestedUids=null,bool selectionOnly=false)
     {
