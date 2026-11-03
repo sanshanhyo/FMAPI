@@ -10,3 +10,11 @@ Process: FM PID 33140, start time 2026-11-03T05:10:43.5722214Z. The existing pro
 - Raw captures remain outside git in the private local directory. Only sanitized status/counts appear here.
 
 One further single-use bounded entity-read command was delegated to OpenCode Go Beam. The first invocation failed PowerShell parsing before the script ran. The corrected invocation completed: selection available, one manager, 64 person-index slots inspected, one exact actual-player sample returned, notClubRoster=true, atomicSnapshot=false. This is actual model-executed bounded reading, not a completed roster or new field-semantic discovery. No historical UID list was reused. The model received sanitized counts only, no private raw capture.
+
+## Follow-up within the released window
+
+The single current-session sample UID was privately passed to the existing explicit-UID lookup mode. One UID requested, one available, one uidMatched, one positionNamesVerified. The 14-name pure decoder ran on the validated block. clubMembershipVerifiedHere=false: this is not a managed-club roster and cannot be represented as one. No historic UID list or all-registry enumeration was used.
+
+The existing offline welcome renderer was run against this session's message capture and the previously extracted local template file. It returned title=complete under its guarded single-owner/team-short rules and body=partial. The remaining token is `[%male#1-first]`; ownerRegistryLookupVerified=true but nativeSuppliedContextMatched=false. This is a renderer result under stated assumptions, not a claim that the game returned a final formatted title or complete body. No original title/body text is published.
+
+The window round is complete; no reader command remains active. Other domains still require pinned static entry-point evidence before any process read; no broad scan is scheduled. FA may reacquire exclusive access, and another round requires coordination.
