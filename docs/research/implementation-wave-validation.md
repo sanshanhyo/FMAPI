@@ -13,3 +13,7 @@ Repairs after model delivery included unsigned metadata-header fixtures, a nine-
 The live interface remains tools/FMAPI.MessageProbe: manager selection and club-team container, explicit UID-linked positions/player contract relations, native service RTTI diagnostic, and bounded message/template capture. Existing known limitations remain, including no complete roster, no fixture-list reader, incomplete message formatting and non-atomic reads. Native calls, game writes, UI extraction and unbounded scans are not enabled.
 
 No new FM memory reads occurred during this implementation-validation wave. No package or release was published.
+
+## Actual-file qualification failure
+
+Subsequent coordinator test of find_property_literals.py on the pinned real metadata failed closed with `section 0 size is not a whole literal-entry table`. The generated parser incorrectly assumed a six-integer header, 8-byte length/index entries and UTF16LE. This profile actually uses section offset/size/count triples, a section0 uint32 boundary-offset table and section1 UTF8 data, as independently recorded in roster-property-candidates.md. Its synthetic fixtures shared the wrong assumptions. Therefore this tool is NOT validated for the real build and must not be used to infer property indices until corrected and retested against GameCurrentManager9070/FirstTeamPlayers8681 controls. Other tools' synthetic passes also do not imply actual-file compatibility. A twelve-lane compatibility review wave was submitted; no runtime capability is promoted by it.
