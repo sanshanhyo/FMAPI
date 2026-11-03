@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/FMAPI.Core/FMAPI.Core.csproj" />
+    <ProjectReference Include="../../tests/FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
+    <ProjectReference Include="../../samples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
+  </ItemGroup>
+</Project>

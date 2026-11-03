@@ -1,6 +1,6 @@
 # Contributing to FMAPI
 
-Start with the [project scope](docs/scope.md) and [architecture](docs/architecture.md). FMAPI currently provides an offline framework foundation; real-game support requires separate evidence and implementation.
+Start with the [project scope](docs/scope.md) and [architecture](docs/architecture/overview.md). FMAPI currently provides an offline framework foundation; real-game support requires separate evidence and implementation.
 
 ## Local checks
 
@@ -10,14 +10,14 @@ Use the .NET 10 SDK selected by `global.json`. From the repository root:
 dotnet restore FMAPI.slnx
 dotnet build FMAPI.slnx --configuration Release --no-restore
 dotnet test FMAPI.slnx --configuration Release --no-build
-dotnet run --project src/FMAPI.Cli --configuration Release --no-build -- demo
+dotnet run --project tools/FMAPI.Cli --configuration Release --no-build -- demo
 ```
 
 Run checks relevant to your change. Add behavior tests for lifecycle, event cleanup, UI ownership, compatibility checks, and command policy when those behaviors change. Describe commands actually run and any remaining limitations in the pull request.
 
 ## Public API changes
 
-- Keep `FMAPI.Sdk` independent of host implementation, companion applications, and game-version internals.
+- Keep `FMAPI.SDK` independent of host implementation, companion applications, and game-version internals.
 - Describe the consumer impact of a changed contract, update the example and documentation, and add a decision record for substantial design changes.
 - Treat `0.x` APIs as experimental, while making breaking changes visible in review.
 - Preserve explicit unsupported or unknown results. Synthetic examples must remain clearly labeled.

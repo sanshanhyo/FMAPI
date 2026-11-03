@@ -1,50 +1,53 @@
 # Repository structure / 仓库结构
 
-当前重点是取得可重复验证的真实游戏数据，再逐步整理长期 SDK。已有离线基础保留；本次初始化只增加文档和目录入口，不增加项目、依赖或运行时实现。
-
-## 目录图
+本次已实际迁移源码、工程文件和文档，并更新解决方案、项目引用与 CI 路径。不是仅添加目录说明。
 
 ```text
-FMAPI/
-├── src/
-│   ├── FMAPI.Sdk/             已有公共契约；暂缓扩展
-│   ├── FMAPI.Core/            已有生命周期、事件、UI 声明和权限策略
-│   ├── FMAPI.Adapters.Mock/   已有合成数据适配器
-│   ├── FMAPI.Cli/             已有离线演示入口
-│   ├── FMAPI.Host.BepInEx/    预留：进程内宿主、启动与生命周期
-│   ├── FMAPI.Game/            预留：游戏领域数据整理
-│   ├── FMAPI.Adapters.FM27/   预留：版本相关实现
-│   │   ├── Memory/           只读访问与边界检查
-│   │   ├── Layouts/          经验证的结构布局
-│   │   ├── NativeCalls/      原生调用边界；当前不实现
-│   │   └── Profiles/         精确构建身份与能力配置
-│   └── FMAPI.Installer/      预留：安装、检测、卸载与恢复
-├── tools/Probes/             研究探针规范；尚无可执行探针
-├── examples/FMAPI.SampleMod/ 已有示例，清单仍为 mod.json
-├── tests/FMAPI.Core.Tests/   已有离线行为测试
-├── docs/
-│   ├── architecture.md      已有架构说明，不迁移
-│   ├── research-baseline.md 已有公开资料基线，不迁移
-│   ├── architecture/        新模块边界与后续设计入口
-│   ├── research/            构建记录、数据发现模板
-│   └── modding/             现有示例与未来文档入口
-└── THIRD_PARTY_NOTICES.md    依赖归属记录入口
+src/
+  FMAPI.Host.BepInEx/         宿主项目边界；BepInEx 启动实现待完成
+  FMAPI.Core/
+    Lifecycle/               原有 ModHost 与资源生命周期代码
+    Events/                  原有 EventRegistry
+    UI/                      原有 UiRegistry
+    Permissions/             原有权限与默认拒绝配置
+  FMAPI.Game/
+    GameBuildInfo.cs          从原 SDK 迁入的版本身份模型
+    GameSnapshot.cs           从原 SDK 迁入的只读快照模型
+    Managers/ Clubs/ Players/ Fixtures/ Matches/ Messages/
+  FMAPI.Adapters.FM27/
+    Memory/ Layouts/ NativeCalls/ Profiles/
+  FMAPI.SDK/
+    Game/                    原有 mod 游戏访问契约
+    Mods/                    原有 mod 生命周期、事件与 UI 契约
+  FMAPI.Installer/            安装工具项目边界；功能待实现
+tools/
+  Probes/                    研究探针项目边界；尚无可执行探针
+  FMAPI.Cli/                 原有离线演示入口
+tests/
+  FMAPI.Adapters.Mock/        原有合成数据适配器
+  FMAPI.Core.Tests/           原有离线测试
+samples/FMAPI.SampleMod/      从 examples 迁入，清单仍为 mod.json
+docs/
+  architecture/overview.md   原 architecture.md 内容
+  research/public-baseline.md 原 research-baseline.md 内容
+  modding/
+THIRD_PARTY_NOTICES.md
 ```
 
-图中“预留”目录目前只有 README，不是可编译项目，也不代表游戏支持已经实现。FMAPI.Game 的 Managers、Clubs、Players、Fixtures、Matches、Messages 是计划中的领域分组，等有真实数据和具体代码再创建对应子目录。
+## 项目依赖
 
-## 数据优先的开发顺序
+- Game 不依赖其他 FMAPI 项目；SDK → Game。
+- Core → SDK；FM27 → SDK（传递取得 Game）。
+- Host.BepInEx → Core、FM27；Probes → FM27。
+- Installer 独立，尚未选择安装技术或引入依赖。
+- 测试 Mock → SDK；离线 CLI → Core、Mock、SampleMod；SampleMod → SDK。
 
-1. 使用 [构建记录模板](research/build-record-template.md) 记录精确游戏版本、平台、渠道和探针版本。
-2. 选择一个最小只读目标，例如当前经理与所属俱乐部，使用 [数据发现模板](research/data-discovery-template.md) 区分猜测和验证结果。
-3. 复现加载、重新加载存档及退出等生命周期下的读取；未知构建停止读取，不猜测偏移。
-4. 将有证据的版本细节放入 FM27 适配器，领域含义放入 Game；只提交可共享的说明和自有/合成测试材料。
-5. 证据成熟后才讨论公共 SDK 扩展、原生调用、写操作和安装工具。
+原有 SDK 命名空间统一为 `FMAPI.SDK`；`GameBuildInfo` 和 `GameSnapshot` 迁入 `FMAPI.Game`。这是尚未发布的实验性代码的结构变更，已有源码使用方需更新 using 和项目引用，不能视为二进制兼容承诺。没有增加公共 API 功能。所有现有调用方已一起调整。
 
-Host 负责启动与生命周期，Adapter 负责版本相关访问，Game 负责领域含义。SDK 不依赖这些实现。此分层是方向，不强行新增依赖或迁移已有代码。
+Host、FM27、Installer 和 Probes 目前是可构建的项目边界，不假装具有尚未验证的运行时功能。Game 六个领域目录已落地，暂无真实字段代码的目录以 .gitkeep 保存。未知偏移、原生签名和游戏状态写入不在本次重构中实现。
 
-保留大小写 `FMAPI.Sdk`，不另建 `FMAPI.SDK`；保留 `examples/`，不另建 `samples/`。研究分支和未推送的本地工作须另行审阅，目录初始化不会自动合入。
+## 当前开发重点
 
-## 验证与状态
+先取得最小可重复的只读真实数据，再扩展长期 SDK。使用 [构建记录](research/build-record-template.md) 与 [数据发现模板](research/data-discovery-template.md)，先验证当前经理与俱乐部等小目标。证据满足 [兼容性要求](compatibility.md) 才能声明游戏支持。
 
-现有解决方案、项目引用和 CI 不变。按 [贡献指南](../CONTRIBUTING.md) 验证离线构建；CI 成功不证明真实游戏兼容。真实支持必须满足 [兼容性证据要求](compatibility.md)。
+[贡献指南](../CONTRIBUTING.md) 的离线构建、测试和 demo 继续有效；CI 通过不等于游戏兼容。没有合入其他研究分支或未推送的本地工作。

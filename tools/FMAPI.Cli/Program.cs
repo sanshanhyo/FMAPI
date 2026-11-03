@@ -1,12 +1,12 @@
 using FMAPI.Adapters.Mock;
 using FMAPI.Core;
 using FMAPI.SampleMod;
-using FMAPI.Sdk;
+using FMAPI.SDK;
 
 if (args.Length != 1 || args[0] != "demo")
 {
     Console.WriteLine("FMAPI 0.1.0-alpha.1 — Football Manager Modding API");
-    Console.WriteLine("Usage: dotnet run --project src/FMAPI.Cli -- demo");
+    Console.WriteLine("Usage: dotnet run --project tools/FMAPI.Cli -- demo");
     Console.WriteLine("The demo uses synthetic in-memory data. No real-game adapter is available.");
     return args.Length == 0 || args is ["--help"] or ["-h"] ? 0 : 2;
 }

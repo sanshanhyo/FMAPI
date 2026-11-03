@@ -2,7 +2,7 @@
 
 **Football Manager Modding API** 是面向 Football Manager 模组和工具的独立、非官方 C# 框架。
 
-[English](README.md) · [架构](docs/architecture.md) · [路线图](docs/roadmap.md) · [贡献指南](CONTRIBUTING.md)
+[English](README.md) · [架构](docs/architecture/overview.md) · [路线图](docs/roadmap.md) · [贡献指南](CONTRIBUTING.md)
 
 FMAPI 的目标是提供版本化接口，统一模组生命周期、事件、UI 扩展和受控游戏命令。具体游戏版本的接入由适配器负责，公共 SDK 与游戏内存布局、外部助教应用分开维护。
 
@@ -28,28 +28,28 @@ FMAPI 的目标是提供版本化接口，统一模组生命周期、事件、UI
 dotnet restore FMAPI.slnx
 dotnet build FMAPI.slnx --configuration Release --no-restore
 dotnet test FMAPI.slnx --configuration Release --no-build
-dotnet run --project src/FMAPI.Cli --configuration Release --no-build -- demo
+dotnet run --project tools/FMAPI.Cli --configuration Release --no-build -- demo
 ```
 
 示例会加载模组、处理事件、注册 UI 声明，依次展示默认拒绝写入、dry-run 验证、显式授权后修改 mock 数据，并展示卸载时的资源清理。
 
-[示例模组](examples/FMAPI.SampleMod) 展示公共 SDK 的基本用法。当前 CLI 是离线演示宿主；此次初始化不包含真实游戏安装或注入流程。
+[示例模组](samples/FMAPI.SampleMod) 展示公共 SDK 的基本用法。当前 CLI 是离线演示宿主；此次初始化不包含真实游戏安装或注入流程。
 
 ## 工程结构
 
 ```text
-src/FMAPI.Sdk/              模组作者和适配器使用的公共接口
+src/FMAPI.SDK/              模组作者和适配器使用的公共接口
 src/FMAPI.Core/             宿主、生命周期、事件、UI 注册表与命令策略
-src/FMAPI.Adapters.Mock/    使用合成数据的内存适配器
-src/FMAPI.Cli/              离线演示宿主
-examples/FMAPI.SampleMod/  仅依赖公共 SDK 的示例模组
+tests/FMAPI.Adapters.Mock/    使用合成数据的内存适配器
+tools/FMAPI.Cli/              离线演示宿主
+samples/FMAPI.SampleMod/  仅依赖公共 SDK 的示例模组
 tests/FMAPI.Core.Tests/     宿主行为与权限策略测试
 docs/                      范围、架构、兼容性和设计决策
 ```
 
 ## 写入控制
 
-宿主默认关闭写入。执行命令需要同时满足宿主启用写入、模组申请写能力、宿主显式授予能力、宿主的全局与模组级命令白名单均允许，以及适配器支持并验证该命令。命令默认使用 dry-run，只做验证，不执行命令。详见[架构说明](docs/architecture.md)。
+宿主默认关闭写入。执行命令需要同时满足宿主启用写入、模组申请写能力、宿主显式授予能力、宿主的全局与模组级命令白名单均允许，以及适配器支持并验证该命令。命令默认使用 dry-run，只做验证，不执行命令。详见[架构说明](docs/architecture/overview.md)。
 
 这些检查管理通过 FMAPI 接口运行的合作式模组，无法隔离同进程中的恶意代码。真实适配器必须进一步规定游戏线程调度、状态校验、失败处理和恢复行为。
 

@@ -20,8 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/FMAPI.Core/FMAPI.Core.csproj" />
-    <ProjectReference Include="../../src/FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
-    <ProjectReference Include="../../examples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
+    <ProjectReference Include="../FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
+    <ProjectReference Include="../../samples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 using System.Collections.Frozen;
-using FMAPI.Sdk;
+using FMAPI.SDK;
 
 namespace FMAPI.Core;
 

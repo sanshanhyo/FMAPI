@@ -1,14 +1,21 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/FMAPI.Sdk/FMAPI.Sdk.csproj" />
+    <Project Path="src/FMAPI.Adapters.FM27/FMAPI.Adapters.FM27.csproj" />
     <Project Path="src/FMAPI.Core/FMAPI.Core.csproj" />
-    <Project Path="src/FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
-    <Project Path="src/FMAPI.Cli/FMAPI.Cli.csproj" />
+    <Project Path="src/FMAPI.Game/FMAPI.Game.csproj" />
+    <Project Path="src/FMAPI.Host.BepInEx/FMAPI.Host.BepInEx.csproj" />
+    <Project Path="src/FMAPI.Installer/FMAPI.Installer.csproj" />
+    <Project Path="src/FMAPI.SDK/FMAPI.SDK.csproj" />
   </Folder>
-  <Folder Name="/examples/">
-    <Project Path="examples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
+  <Folder Name="/tools/">
+    <Project Path="tools/FMAPI.Cli/FMAPI.Cli.csproj" />
+    <Project Path="tools/Probes/FMAPI.Probes.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/FMAPI.SampleMod/FMAPI.SampleMod.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/FMAPI.Adapters.Mock/FMAPI.Adapters.Mock.csproj" />
     <Project Path="tests/FMAPI.Core.Tests/FMAPI.Core.Tests.csproj" />
   </Folder>
 </Solution>

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../FMAPI.SDK/FMAPI.SDK.csproj" />
+  </ItemGroup>
+</Project>

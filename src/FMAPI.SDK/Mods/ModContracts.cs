@@ -1,7 +1,7 @@
 using System.Collections.Frozen;
 using System.Text.Json;
 
-namespace FMAPI.Sdk;
+namespace FMAPI.SDK;
 
 public static class FmApiVersion
 {

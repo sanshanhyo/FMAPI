@@ -2,7 +2,7 @@
 
 当前优先验证真实游戏数据读取，SDK 扩展暂缓。这个目录是研究记录入口，不是已验证支持列表。
 
-- [公开资料基线](../research-baseline.md)：保留原位置；公开资料不证明运行时能力。
+- [公开资料基线](public-baseline.md)：已迁入本目录；公开资料不证明运行时能力。
 - [构建记录模板](build-record-template.md)：先确定所研究的精确构建。
 - [数据发现模板](data-discovery-template.md)：记录问题、观察、证伪与复现。
 - [探针规范](../../tools/Probes/README.md)：有限、只读、可退出。

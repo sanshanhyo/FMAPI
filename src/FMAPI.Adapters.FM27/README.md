@@ -1,6 +1,6 @@
 # FMAPI.Adapters.FM27
 
-状态：研究目录预留，未实现，没有经验证的 FM27 支持。
+状态：已建立可构建适配器项目并加入解决方案；实际读取未实现，没有经验证的 FM27 支持。
 
 - [Memory](Memory/README.md)：只读访问与生命周期保护。
 - [Layouts](Layouts/README.md)：有证据的字段、类型和布局。

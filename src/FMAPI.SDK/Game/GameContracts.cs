@@ -1,10 +1,8 @@
+using FMAPI.Game;
 using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 
-namespace FMAPI.Sdk;
-
-public sealed record GameBuildInfo(
-    string Title, string BuildId, string Platform, string Architecture, string Storefront, bool IsSynthetic);
+namespace FMAPI.SDK;
 
 public sealed class AdapterDescriptor
 {
@@ -23,18 +21,6 @@ public sealed class AdapterDescriptor
         SupportsReads = supportsReads;
         SupportsWrites = supportsWrites;
         SupportedWriteCommands = (supportedWriteCommands ?? []).ToFrozenSet(StringComparer.Ordinal);
-    }
-}
-
-public sealed class GameSnapshot
-{
-    public GameBuildInfo Build { get; }
-    public IReadOnlyDictionary<string, string> Values { get; }
-
-    public GameSnapshot(GameBuildInfo build, IReadOnlyDictionary<string, string> values)
-    {
-        Build = build ?? throw new ArgumentNullException(nameof(build));
-        Values = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(values, StringComparer.Ordinal));
     }
 }
 

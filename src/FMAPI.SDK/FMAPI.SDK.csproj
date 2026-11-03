@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../FMAPI.Game/FMAPI.Game.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,4 +1,4 @@
-using FMAPI.Sdk;
+using FMAPI.SDK;
 
 namespace FMAPI.SampleMod;
 

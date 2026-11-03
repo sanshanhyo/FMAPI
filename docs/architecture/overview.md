@@ -6,7 +6,7 @@ FMAPI keeps public mod contracts separate from host policy and game-build integr
 Sample mod / future third-party mods
                 |
                 v
-          FMAPI.Sdk contracts
+          FMAPI.SDK contracts
                 |
                 v
           FMAPI.Core host
@@ -20,7 +20,7 @@ Sample mod / future third-party mods
                  synthetic state
 ```
 
-`FMAPI.Sdk` has no dependency on Core or a concrete adapter. `FMAPI.Core` consumes the SDK's contracts. The demo host composes Core, the mock adapter, and the sample mod. A future game adapter can implement the same contracts without exposing game-version details to mods.
+`FMAPI.SDK` references the version-independent `FMAPI.Game` model assembly, but has no dependency on Core or a concrete adapter. `FMAPI.Core` consumes the SDK's contracts. The demo host composes Core, the mock adapter, and the sample mod. A future game adapter can implement the same contracts without exposing game-version details to mods.
 
 ## Mod lifecycle and resource ownership
 
@@ -58,4 +58,4 @@ The policy governs calls through FMAPI. It is not a security boundary against ar
 
 The SDK API version identifies framework contracts. Game identity and capabilities belong to the adapter. A compatible API version does not establish game compatibility, and a platform build does not establish successful runtime integration.
 
-Keep game offsets, fingerprints, internal types, and private bootstrap details out of public SDK contracts. Record verified adapter support using the [compatibility evidence requirements](compatibility.md).
+Keep game offsets, fingerprints, internal types, and private bootstrap details out of public SDK contracts. Record verified adapter support using the [compatibility evidence requirements](../compatibility.md).

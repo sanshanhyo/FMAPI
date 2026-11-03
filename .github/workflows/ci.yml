@@ -33,4 +33,4 @@ jobs:
       - name: Test
         run: dotnet test FMAPI.slnx --configuration Release --no-build
       - name: Run offline demo
-        run: dotnet run --project src/FMAPI.Cli --configuration Release --no-build -- demo
+        run: dotnet run --project tools/FMAPI.Cli --configuration Release --no-build -- demo

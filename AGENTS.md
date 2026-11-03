@@ -2,11 +2,11 @@
 
 ## Scope and ownership
 
-FMAPI is an independent, unofficial Football Manager modding framework under MIT. Its current implementation is an offline foundation. Read `README.md`, `docs/scope.md`, and `docs/architecture.md` before changing framework behavior.
+FMAPI is an independent, unofficial Football Manager modding framework under MIT. Its current implementation is an offline foundation. Read `README.md`, `docs/scope.md`, and `docs/architecture/overview.md` before changing framework behavior.
 
-- `src/FMAPI.Sdk` owns public contracts and must not reference Core, a concrete adapter, or a companion application.
+- `src/FMAPI.SDK` owns public contracts and must not reference Core, a concrete adapter, or a companion application.
 - `src/FMAPI.Core` owns host policy and mod-scoped resources.
-- `src/FMAPI.Adapters.Mock` and example data are synthetic.
+- `tests/FMAPI.Adapters.Mock` and example data are synthetic.
 - Real-game support must live behind adapter contracts, with compatibility evidence documented per game build and platform.
 
 ## Development

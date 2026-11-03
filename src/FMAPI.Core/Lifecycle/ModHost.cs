@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using FMAPI.Sdk;
+using FMAPI.SDK;
 
 namespace FMAPI.Core;
 

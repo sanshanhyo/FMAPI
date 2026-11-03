@@ -1,7 +1,8 @@
+using FMAPI.Game;
 using FMAPI.Adapters.Mock;
 using FMAPI.Core;
 using FMAPI.SampleMod;
-using FMAPI.Sdk;
+using FMAPI.SDK;
 using OfflineSampleMod = FMAPI.SampleMod.SampleMod;
 
 namespace FMAPI.Core.Tests;

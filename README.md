@@ -2,7 +2,7 @@
 
 **Football Manager Modding API** is an independent, unofficial framework for building Football Manager mods and tools in C#.
 
-[简体中文](README.zh-CN.md) · [Architecture](docs/architecture.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md)
+[简体中文](README.zh-CN.md) · [Architecture](docs/architecture/overview.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md)
 
 FMAPI aims to give mods a versioned API for lifecycle management, events, UI extensions, and controlled game commands. Game-specific integration belongs in adapters, so a mod can depend on public contracts without depending on a particular game's memory layout or a companion application.
 
@@ -28,28 +28,28 @@ Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), th
 dotnet restore FMAPI.slnx
 dotnet build FMAPI.slnx --configuration Release --no-restore
 dotnet test FMAPI.slnx --configuration Release --no-build
-dotnet run --project src/FMAPI.Cli --configuration Release --no-build -- demo
+dotnet run --project tools/FMAPI.Cli --configuration Release --no-build -- demo
 ```
 
 The demo loads the sample mod, handles an event, registers a UI declaration, demonstrates a denied write, validates a dry-run, and explicitly authorizes a command against the mock adapter. It also shows resource cleanup when the mod unloads.
 
-See [the sample mod](examples/FMAPI.SampleMod) for a small implementation of the SDK contracts. The CLI is an offline demonstration host; real-game installation and injection are outside this initialization.
+See [the sample mod](samples/FMAPI.SampleMod) for a small implementation of the SDK contracts. The CLI is an offline demonstration host; real-game installation and injection are outside this initialization.
 
 ## Project layout
 
 ```text
-src/FMAPI.Sdk/              Public contracts for mod authors and adapters
+src/FMAPI.SDK/              Public contracts for mod authors and adapters
 src/FMAPI.Core/             Host, lifecycle, events, UI registry, command policy
-src/FMAPI.Adapters.Mock/    Synthetic in-memory adapter
-src/FMAPI.Cli/              Offline demonstration host
-examples/FMAPI.SampleMod/  Example mod using the public SDK
+tests/FMAPI.Adapters.Mock/    Synthetic in-memory adapter
+tools/FMAPI.Cli/              Offline demonstration host
+samples/FMAPI.SampleMod/  Example mod using the public SDK
 tests/FMAPI.Core.Tests/     Host behavior and policy tests
 docs/                      Scope, architecture, compatibility, decisions
 ```
 
 ## Controlled commands
 
-Writes are disabled by default. A command can execute only when the host enables writes, the mod requests the write capability, the host explicitly grants it, the host-wide and per-mod allowlists permit the command, and the adapter supports and validates it. Commands default to dry-run; validation never executes the command. Read [the architecture](docs/architecture.md) for the policy boundary.
+Writes are disabled by default. A command can execute only when the host enables writes, the mod requests the write capability, the host explicitly grants it, the host-wide and per-mod allowlists permit the command, and the adapter supports and validates it. Commands default to dry-run; validation never executes the command. Read [the architecture](docs/architecture/overview.md) for the policy boundary.
 
 These checks coordinate cooperative mods through the FMAPI API. They do not isolate malicious code loaded into the same process. A real adapter must define game-thread scheduling, state validation, failure handling, and any recovery behavior before claiming write support.
 
