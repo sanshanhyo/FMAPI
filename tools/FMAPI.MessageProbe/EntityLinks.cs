@@ -94,6 +94,8 @@ sealed partial class Probe
         const string gameAssemblyHash="820D6618ACAFAC7DFFC1EF3B489582EDDB84B0343D4F34D55FFF9FB70881E00A";
         var assembly=process.Modules.Cast<System.Diagnostics.ProcessModule>().Single(module=>string.Equals(module.ModuleName,"GameAssembly.dll",StringComparison.OrdinalIgnoreCase));
         using(var stream=File.OpenRead(assembly.FileName))if(Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))!=gameAssemblyHash)throw new InvalidDataException("Unsupported GameAssembly selection-name mapping profile");
+        var teamServiceRoot=selectionOnly?0:Pointer(moduleBase+0x57034A0);
+        var teamServiceType=selectionOnly?null:CandidateType(teamServiceRoot);
         var selected=Pointer(moduleBase+0x56F32C8);var selectedType=CandidateType(selected);
         var selectedIdentity=selected==0?Array.Empty<byte>():Read(selected,16);
         object? activeManager=null;int selectionMatches=0;
@@ -138,6 +140,7 @@ sealed partial class Probe
         if(Pointer(moduleBase+0x56F32C8)!=selected || (selected!=0 && !Read(selected,16).SequenceEqual(selectedIdentity)))throw new InvalidOperationException("Selected manager changed");
         object positions=selectionOnly?new {status="not-requested"}:requestedUids==null?SamplePlayerPositions():ReadRequestedPositions(requestedUids);
         var selection=new {status=selectionMatches==1?"available":"unavailable",sourcePropertyKey="GCuM",selectedType,matchedHumanOwner=selectionMatches==1,reason=selectionMatches==1?(string?)null:selected==0?"no native current-manager selection":"selected record not matched to validated human-owner collection"};
-        return new {status="partial",selection,positions,binarySha256=Hash,gameAssemblySha256=gameAssemblyHash,processId=process.Id,processStartedAt=started.ToUniversalTime(),atomicSnapshot=false,managerCandidates=managers,activeManager,unsupported=new[]{"cross-session active-selection stability","current match/tactic position assignment","cross-save UID persistence"}};
+        if(!selectionOnly && Pointer(moduleBase+0x57034A0)!=teamServiceRoot)throw new InvalidOperationException("Team service root changed");
+        return new {status="partial",selection,positions,teamServiceType,binarySha256=Hash,gameAssemblySha256=gameAssemblyHash,processId=process.Id,processStartedAt=started.ToUniversalTime(),atomicSnapshot=false,managerCandidates=managers,activeManager,unsupported=new[]{"cross-session active-selection stability","current match/tactic position assignment","cross-save UID persistence"}};
     }
 }
