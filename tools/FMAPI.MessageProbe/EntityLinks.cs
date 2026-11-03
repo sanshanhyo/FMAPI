@@ -3,6 +3,14 @@ using System.IO;
 
 sealed partial class Probe
 {
+    public object CaptureNativeRoots()
+    {
+        budget=65536;
+        var root=Pointer(moduleBase+0x5703768);
+        var contextTableType=CandidateType(root);
+        if(Pointer(moduleBase+0x5703768)!=root)throw new InvalidOperationException("Context registry root changed");
+        return new {status=root==0?"unavailable":"candidate-root",contextTableType,binarySha256=Hash,processId=process.Id,processStartedAt=started.ToUniversalTime(),atomicSnapshot=false,recordsRead=0,notFixtureList=true};
+    }
     string? CandidateType(ulong pointer)
     {
         if(pointer==0)return null;
