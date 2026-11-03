@@ -71,6 +71,20 @@ sealed partial class Probe
         if(Pointer(moduleBase+0x5703738)!=table || Read(table+0x5C,1)[0]!=flags || ((flags&1)!=0 && Read(table+0xA0,1)[0]!=dirty) || ((flags&1)==0 && Pointer(table+0x80)!=indirect) || !Read(vector,24).SequenceEqual(bounds))throw new InvalidOperationException("UID index changed");
         return new {status="partial",scope="explicit requested UIDs; no all-registry scan",requested=requested.Length,records,clubMembershipVerifiedHere=false};
     }
+    object ReadClubTeamCandidates(ulong club,ulong currentTeam)
+    {
+        var header=Read(club+0x18,24);var begin=BitConverter.ToUInt64(header);
+        int count=Bounds.Count(begin,BitConverter.ToUInt64(header,8),BitConverter.ToUInt64(header,16),8,32);
+        var entries=count==0?Array.Empty<byte>():Read(begin,count*8);int validated=0;bool currentFound=false;
+        foreach(var i in Enumerable.Range(0,count))
+        {
+            var team=BitConverter.ToUInt64(entries,i*8);
+            if(team==0 || CandidateType(team)!=".?AVTEAM@db@@" || Pointer(team+0x30)!=club)throw new InvalidDataException("Club-team candidate type/backlink mismatch");
+            validated++;currentFound|=team==currentTeam;
+        }
+        if(!Read(club+0x18,24).SequenceEqual(header) || (count>0 && !Read(begin,count*8).SequenceEqual(entries)))throw new InvalidOperationException("Club-team container changed");
+        return new {status="candidate-structure",count,validatedTeamBacklinks=validated,currentEmploymentTeamFound=currentFound,notPlayerRoster=true,teamHierarchySemanticsVerified=false};
+    }
     object ReadPlayerEmployment(ulong person,ulong player)
     {
         if(Pointer(Pointer(person)+0x3C0)!=moduleBase+0x1634E50)throw new InvalidDataException("Unsupported player employment getter");
@@ -130,7 +144,8 @@ sealed partial class Probe
             {
                 selectionMatches++;
                 if(!selectedIdentity.AsSpan(8,8).SequenceEqual(identity))throw new InvalidOperationException("Selected manager identity changed");
-                activeManager=new {uid=BitConverter.ToUInt32(identity,4),clubUid=clubUidCandidate,contractType,contractKind,source="native GameCurrentManager (GCuM) selection global",activeVerified=true,atomicSnapshot=false};
+                var clubTeams=payloadField30Type==".?AVCLUB@db@@"?ReadClubTeamCandidates(linkedClub,payload):null;
+                activeManager=new {uid=BitConverter.ToUInt32(identity,4),clubUid=clubUidCandidate,contractType,contractKind,clubTeams,source="native GameCurrentManager (GCuM) selection global",activeVerified=true,atomicSnapshot=false};
             }
             if(!Read(person+8,8).SequenceEqual(identity) || Pointer(virtualBase+0x80)!=contract || (payload!=0 && Pointer(contract+0x10)!=payload) || (linkedClub!=0 && Pointer(payload+0x30)!=linkedClub) || (clubUidCandidate!=null && BitConverter.ToUInt32(Read(linkedClub+0x0C,4))!=clubUidCandidate) || (contractKind!=null && Read(contract+0x26,1)[0]!=contractKind))throw new InvalidOperationException("Manager entity changed");
             managers.Add(new {personReferenceCandidate=BitConverter.ToUInt32(identity),personUidCandidate=BitConverter.ToUInt32(identity,4),flag422Raw=flag,contractType,contractKind,kindMethodRva,payloadType,payloadField30Type,clubUidCandidate,activeVerified=isSelected});
