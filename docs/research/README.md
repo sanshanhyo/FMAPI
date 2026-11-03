@@ -2,6 +2,8 @@
 
 当前优先验证真实游戏数据读取，SDK 扩展暂缓。这个目录是研究记录入口，不是已验证支持列表。
 
+- [全接口盘点与实现状态](interface-inventory.md)：157 个任务组，分别记录读取、操作和事件目标的证据与集成状态。
+- [全域数据发现 TODO](data-discovery-todo.md)：26 个领域、83 个读取任务组，以及并行分派和验收协议。
 - [公开资料基线](public-baseline.md)：已迁入本目录；公开资料不证明运行时能力。
 - [构建记录模板](build-record-template.md)：先确定所研究的精确构建。
 - [数据发现模板](data-discovery-template.md)：记录问题、观察、证伪与复现。
