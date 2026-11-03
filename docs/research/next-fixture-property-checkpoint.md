@@ -13,3 +13,11 @@ The general locator subsequently completed successfully and independently return
 ## First bounded context-root read
 
 Static helper0x329AA0 first extracts a packed context record through0x329520, then resolves it through0xD789B0. The latter checks packed high-byte kind0x35 and a fixed global0x5703768. A single native-hash-gated bounded read on PID33140 confirmed the root RTTI is DATABASE_TABLE<TEAM_BASE>, NOT a fixture table. Root recheck passed. This corrects the tempting but invalid attribution based on the helper's use within NextFixture. No records were traversed and no fixture/date/score was obtained. The packed kind's full semantics and table modes remain to be verified. The new --native-roots diagnostic exposes contextTableType with recordsRead=0 and notFixtureList=true; it is not a schedule reader. The initial private capture used a provisional fixtureType field name; public source was corrected immediately after observing the actual type. No raw identity or pointer is published.
+
+## Static index branches, awaiting bounded validation
+
+Sequential decoding of0xD789B0 confirms packed-record kind0x35 follows global0x5703768. With global mode byte0x5703DE0 nonzero, it reads an indirect vector from table+0x80 (begin/end at indirect+0/+8); with zero mode, begin/end are table+0x60/+0x68. The low23-bit index is checked against count before pointer indexing. This differs from the PERSON UID binary-search vector and must not reuse that layout. No lookup has yet been performed against a known TEAM to prove record/index correspondence, and record+8 identity semantics remain candidates.
+
+The TEAM virtual+0x80 implementation0xEF5430 produces a packed return structure through further virtual/service calls; it is not a direct next-fixture pointer leaf. Its presence in a NextFixture handler path does not by itself establish underlying fixture ownership or a reusable schedule getter. No native call was made. A future validation may compare at most the already-known club-team pointers against specifically selected index entries, with type/root/mode rechecks and no whole-table enumeration.
+
+No live read occurred in this static-index round. Alpha.13 installation/acceptance requested the window; it was released immediately with no active reader, and new reads are paused until coordination resumes.
