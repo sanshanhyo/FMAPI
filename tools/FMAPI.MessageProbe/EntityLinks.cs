@@ -83,15 +83,29 @@ sealed partial class Probe
     {
         var header=Read(club+0x18,24);var begin=BitConverter.ToUInt64(header);
         int count=Bounds.Count(begin,BitConverter.ToUInt64(header,8),BitConverter.ToUInt64(header,16),8,32);
-        var entries=count==0?Array.Empty<byte>():Read(begin,count*8);int validated=0;bool currentFound=false;
+        var entries=count==0?Array.Empty<byte>():Read(begin,count*8);int validated=0,indexMatches=0;bool currentFound=false;
         foreach(var i in Enumerable.Range(0,count))
         {
             var team=BitConverter.ToUInt64(entries,i*8);
             if(team==0 || CandidateType(team)!=".?AVTEAM@db@@" || Pointer(team+0x30)!=club)throw new InvalidDataException("Club-team candidate type/backlink mismatch");
             validated++;currentFound|=team==currentTeam;
+            if(CheckTeamIndexCandidate(team))indexMatches++;
         }
         if(!Read(club+0x18,24).SequenceEqual(header) || (count>0 && !Read(begin,count*8).SequenceEqual(entries)))throw new InvalidOperationException("Club-team container changed");
-        return new {status="candidate-structure",count,validatedTeamBacklinks=validated,currentEmploymentTeamFound=currentFound,notPlayerRoster=true,teamHierarchySemanticsVerified=false};
+        return new {status="candidate-structure",count,validatedTeamBacklinks=validated,indexCandidatePointerMatches=indexMatches,currentEmploymentTeamFound=currentFound,notPlayerRoster=true,teamHierarchySemanticsVerified=false};
+    }
+    bool CheckTeamIndexCandidate(ulong team)
+    {
+        var table=Pointer(moduleBase+0x5703768);
+        if(CandidateType(table)!=".?AV?$DATABASE_TABLE@VTEAM_BASE@db@@@db@@")throw new InvalidDataException("Unsupported TEAM_BASE table");
+        var mode=Read(moduleBase+0x5703DE0,1)[0];var indirect=mode==0?0:Pointer(table+0x80);
+        var vector=mode==0?table+0x60:indirect;var h=Read(vector,16);
+        var begin=BitConverter.ToUInt64(h);var end=BitConverter.ToUInt64(h,8);
+        if(end<begin || (end-begin)%8!=0 || end-begin>8000000 || (begin==0 && end!=0))throw new InvalidDataException("TEAM_BASE index bounds");
+        var reference=BitConverter.ToUInt32(Read(team+8,4));var index=reference&0x7FFFFFu;
+        ulong record=index<(end-begin)/8?Pointer(begin+index*8):0;
+        if(Pointer(moduleBase+0x5703768)!=table || Read(moduleBase+0x5703DE0,1)[0]!=mode || (mode!=0 && Pointer(table+0x80)!=indirect) || !Read(vector,16).SequenceEqual(h) || BitConverter.ToUInt32(Read(team+8,4))!=reference)throw new InvalidOperationException("TEAM_BASE index changed");
+        return record==team;
     }
     object ReadPlayerEmployment(ulong person,ulong player)
     {
