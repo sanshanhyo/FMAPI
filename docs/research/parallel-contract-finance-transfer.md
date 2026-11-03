@@ -24,7 +24,7 @@ The diagnostic refuses any other fingerprint before opening a process.
 | --- | --- | --- |
 | `game_plugin.dll` SHA-256 | `BC940E472418FC5C214208D7CF30FECF600F689B6F9D71C11BA19A2DF0FE057F` | `native-entity-evidence.md:7`, `tools/FMAPI.MessageProbe/Program.cs:100` |
 | `GameAssembly.dll` SHA-256 | `820D6618ACAFAC7DFFC1EF3B489582EDDB84B0343D4F34D55FFF9FB70881E00A` | `native-entity-evidence.md:8`, `tools/FMAPI.MessageProbe/EntityLinks.cs:75` |
-| Metadata | signature `0xFAB11BAF`, version 39 (position work only; not re-audited here) | `native-entity-evidence.md:8` |
+| Metadata | signature `0xFAB11BAF`, version 39 (position work only; not re-audited here) | `native-entity-evidence.md:9` |
 | Environment context | Unity `6000.3.18f1-custom` (`96cdb67fb884`) noted in the message checkpoint | `message-reader-checkpoint.md:69` |
 
 Observed session date for the underlying research: 2026-11-02. The result was
@@ -195,6 +195,25 @@ scans, injection, native calls or writes.
    with the pinned hashes; capture to a private path outside the repository;
    publish only sanitized field names, types, units and provenance. Every
    unsupported or absent field must remain `unavailable`.
+
+## Provenance classification
+
+- Historical evidence (pre-existing, not re-run this wave): local research commits through `99aba1d`, `docs/research/manager-player-links-checkpoint.md`, `native-entity-evidence.md`, `message-reader-checkpoint.md`, and `tools/FMAPI.MessageProbe` source. It supports only the manager employment chain and position decoding, not dates/wages/finance/transfers.
+- This-wave offline artifacts: `docs/research/parallel-contract-finance-transfer.md` and the four narrowly relevant evidence notes in `docs/research/interface-inventory.md`. No capture, binary, UID array or process output was created.
+- New live reads this wave: zero. No process, game install, UI, capture, credential, account setting, network, subprocess or out-of-worktree source was accessed.
+
+## Evidence corrections (this wave)
+
+- Metadata signature/version citation corrected to `native-entity-evidence.md:9` (line 8 is the `GameAssembly.dll` hash).
+- Static field inventory step 1 was clarified: `tools/research/StaticProbe` can only run against the separately obtained pinned `game_plugin.dll` and metadata, which are not in this repository and were not accessed in this wave. It is a future execution-stage prerequisite, not an available offline artifact.
+- No FA reader date/wage claim was upgraded. `interface-inventory.md:42` and `data-discovery-todo.md:191,303` remain downstream user reports with no in-repository offsets, samples or tests.
+- No SDK, adapter, UI, persona, release or remote change was made.
+
+## Single most concrete missing entry/property relationship
+
+The most concrete missing relationship is **FULL_CONTRACT instance → its date and money fields** (start/expiry, status, wage raw/currency/scale/period). We know the exact object type and three pointers, but no field offset for any date or amount is established in checked-in source. The next most concrete is **player UID → contract instance**, because no player-contract entry point or collection anchor is established.
+
+No safe pure decoder is supported by current source evidence: there is no checked-in game binary, metadata, capture JSON or field layout to decode. The bounded plan above is therefore the only honest artifact. The specific blocker is the absence of a pinned game binary/metadata or sanitized capture exposing contract fields; without it, any decoder would be invented.
 
 ## Completion summary
 
