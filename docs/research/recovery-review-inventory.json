@@ -1,0 +1,762 @@
+{
+  "base": "dd1348ab7464a5904fed6f69e49b3860e2fb3389",
+  "liveReadsPerformed": 0,
+  "files": [
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/implementation-board-facilities-history.md",
+      "sourceSha256": "88642a3dc3125240ddc924488bf9076a9fd9390f0315a866594d71a6535e86d9",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "d629c596c2a31521191bc81f0f3e5468ec47ac45f4522ffe5002ead44a692121",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/native-entry-board-facilities-history.md",
+      "sourceSha256": "48f01f2f4241e9faad2046a45af61440e197b3f1f93f7b170ae83e06ad4b75c8",
+      "decision": "included-static-document",
+      "reviewedSha256": "f5cfc4b2ea351f571fdffa3736a19b3810a45076f1a56360ec79eff5d3f29389"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "docs/research/property-entry-board-facilities-history.md",
+      "sourceSha256": "df4a2ef55df9d0c4218abbee94e7b1e49026fcf3f1ce1b58a9c0322f5f16b2fb",
+      "decision": "included-static-document",
+      "reviewedSha256": "b775d14cf5ac659f3303b732ead1dfcf323734227ddbec32a895727b2f0e294a"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "tools/research/entry_board_facilities_history.py",
+      "sourceSha256": "9c3e1947aff542365ea42a3a266c2df24ae490309bac12aef7508dd548de2aa7",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "AssertionError: ['invented offset at .offsetPolicy']"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "tools/research/property_entry_board_facilities_history.py",
+      "sourceSha256": "8e151517d0f4655c0e5db58413259ff9bfa233576af51814b74a1f92bb5e31c8",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "NameError: name 'NEXT_REGISTRATIONS' is not defined"
+    },
+    {
+      "lane": "board-facilities-history",
+      "path": "tools/research/validate_capture_profile.py",
+      "sourceSha256": "9fca470e1177bfa0a6bdf242da96ef04c0f019f9884ae7de400ad72fe88b71f1",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/implementation-contract-finance-transfer.md",
+      "sourceSha256": "098e45f45a699ea77f5932507bc1a7db56bcd9852ac175b9dd22f502a3585d6d",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "fe8de1ee2b4bf89d6df2d4a2ed502b089ac1a75a6cef02e4e5598cb92d2a0137",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/native-entry-contract-finance-transfer.md",
+      "sourceSha256": "33944a219b959e1c356852e7b01777e25e77df41aca4ea5fa0c7342620476e85",
+      "decision": "included-static-document",
+      "reviewedSha256": "d0e3339806cc763aab130ce701d7bb6ea3cac26ee93033890127cdab4000ba72"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "docs/research/property-entry-contract-finance-transfer.md",
+      "sourceSha256": "84271a84ad709dea8226c4fc81a2cd095d6c30843b44132bddecd4003f0844d2",
+      "decision": "included-static-document",
+      "reviewedSha256": "ce629aba9ed2cc8284d29b1e9043885572def426d72c370e6c69a4c80f5d120b"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "tools/research/entry_contract_finance_transfer.py",
+      "sourceSha256": "5cc9fb4ab44e318ea0d26637caed2866bd68d78ba15448ca137b6511d96adb6e",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "5cc9fb4ab44e318ea0d26637caed2866bd68d78ba15448ca137b6511d96adb6e"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "tools/research/property_entry_contract_finance_transfer.py",
+      "sourceSha256": "3c1cd3fdb862a1d45b78f7c3cc809761d6c32e63bd064744d946e873106de94c",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "3c1cd3fdb862a1d45b78f7c3cc809761d6c32e63bd064744d946e873106de94c"
+    },
+    {
+      "lane": "contract-finance-transfer",
+      "path": "tools/research/summarize_contract_links.py",
+      "sourceSha256": "cd6288a830282388d9efbe6ef2d1749fedea541059f638b62fec80719f0b5c59",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/implementation-fixtures-matches.md",
+      "sourceSha256": "18853d3b297ee69ff2c41299a4b5f7dd689b51b5f033143ab25d5dcbae041f90",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "7fcb8efd268c737ceeb0f2de2ff18d8db6f6d44128e546b17e8efd876c9d3f0e",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/native-entry-fixtures-matches.md",
+      "sourceSha256": "52d14ea5b2b16eb413ae09c27489474297bb1361fba402765603852616c545c9",
+      "decision": "included-static-document",
+      "reviewedSha256": "d523582097dd85fca3e32e08b1feb8bb123aa3391b83a6c1e0d09f921fc5df45"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "docs/research/property-entry-fixtures-matches.md",
+      "sourceSha256": "da4e9b4aeee80a50e85c57a89d756ea48d4da5a2501733dfabf98a3071676cc3",
+      "decision": "included-static-document",
+      "reviewedSha256": "1a2f41e3dacd6965141f2a954203f3d0333eae84640cd82766d9f80e4bc261cf"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "tools/research/entry_fixtures_matches.py",
+      "sourceSha256": "26f09abd33262b7f06685d4e7e175c41a6d65f2694f2ac271c9edff408d78658",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": " - forbidden offset key: fieldOffsets"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "tools/research/locate_property_key.py",
+      "sourceSha256": "8d94837af082545c7a9d4a7be66bd087a14dad248b74ab62427beb78f4edc12e",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "fixtures-matches",
+      "path": "tools/research/property_entry_fixtures_matches.py",
+      "sourceSha256": "01c50c3455ec1fadbd61d6bc94f935fe7081e9670232b6cd9fbed854e5d91edb",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "01c50c3455ec1fadbd61d6bc94f935fe7081e9670232b6cd9fbed854e5d91edb"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/implementation-manager-club.md",
+      "sourceSha256": "c5fb1912e4d1431d7e6bb0e9e0b74659bcd8904d965eee757e1a854b5c1ff1e9",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "c5f556d1be1f3d6a767ba4722dc6b5d5ed58e0d6e5d8e4c709e75bab996ed357",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/native-entry-manager-club.md",
+      "sourceSha256": "be355089fb19edb50e4a0a67e0e8694f357b8226f954873b17b0f559d8b4e3e2",
+      "decision": "included-static-document",
+      "reviewedSha256": "dc8cf41b2225871716a0e73bd25b23d63dd7c8bd6d6eb30ea8617b6dba7beff4"
+    },
+    {
+      "lane": "manager-club",
+      "path": "docs/research/property-entry-manager-club.md",
+      "sourceSha256": "8bb74befbb094cc6fe7d99a6966b8d33727aa71dcf3732eef45d0ea8c6bfbc27",
+      "decision": "included-static-document",
+      "reviewedSha256": "94a45593c0d66bc74f2c70364b890a74f68f0e41a7341f32ee70e2485b0b3bfa"
+    },
+    {
+      "lane": "manager-club",
+      "path": "tools/research/entry_manager_club.py",
+      "sourceSha256": "6607a7dc7bff1108e330d479706b4daa86abcb6717241f47c36e66ecdd0c9a1a",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "6607a7dc7bff1108e330d479706b4daa86abcb6717241f47c36e66ecdd0c9a1a"
+    },
+    {
+      "lane": "manager-club",
+      "path": "tools/research/property_entry_manager_club.py",
+      "sourceSha256": "41dd1cb079d23ecba2dc833f4b8280fee409de06c4b21ddba483f2a2911953e3",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "AssertionError: {'status': 'partial', 'matched': [], 'unmatched': [{'index': 0, 'name': 'TeamType', 'status': 'mismatch', 'literalIndex': 'not-supplied', 'nativeKey': 'unproven-must-be-null'}], 'errors': []}"
+    },
+    {
+      "lane": "manager-club",
+      "path": "tools/research/summarize_manager.py",
+      "sourceSha256": "361668852f618e07e8dce34e1a33ebdae1e7ba2d9857c85aa059d9e420502c98",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/implementation-messages-news.md",
+      "sourceSha256": "568fb1c329fe558cb0d9785e216091a3146c7316244591f03a63c5fb36e48517",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "dd4245e68133b1cfd43e4433f4572c523f2f8e3060e163ed5a2922e7565a2a5e",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/native-entry-messages-news.md",
+      "sourceSha256": "fff0a2b0957a09ad00f1dc84c8a8248530384d07b1c2cc58871ee47b2a329e36",
+      "decision": "included-static-document",
+      "reviewedSha256": "0a6e116d0f691cdbbf355eefdce583746e496d3b92dd7b9755ee383161ed06b4"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/parallel-messages-news.md",
+      "sourceSha256": "88c1d4393c53057b6624cdef46ae4d9bd3e072e8f9bc20508135bf0f2c10c9ec",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "messages-news",
+      "path": "docs/research/property-entry-messages-news.md",
+      "sourceSha256": "9be51a0c325805b5d29d276a1d48a7feb14d9dbde2af799dfc7ad2334dd92671",
+      "decision": "included-static-document",
+      "reviewedSha256": "e295bf506aa0026eb51738e8b74d4fa463240d8184a235ed4018bbe30a3f60d4"
+    },
+    {
+      "lane": "messages-news",
+      "path": "tools/research/entry_messages_news.py",
+      "sourceSha256": "e5a58241675aa0d9bebd0c894c3a0c60fdbd0c82c4d353d4b75bbb9d6866eb4c",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "e5a58241675aa0d9bebd0c894c3a0c60fdbd0c82c4d353d4b75bbb9d6866eb4c"
+    },
+    {
+      "lane": "messages-news",
+      "path": "tools/research/property_entry_messages_news.py",
+      "sourceSha256": "581a5c563daa3d2c4cc24bccd4b094a86d1a72b63de43a6934254626975e1e8e",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "26f5028d3c27299bdfc31a440bc7c0e6865f2c6b3309402859746fb206a3fe53"
+    },
+    {
+      "lane": "messages-news",
+      "path": "tools/research/summarize_messages.py",
+      "sourceSha256": "f71308bf72e027e4a371bfefa809cc973e6b15d518c24de1576a16d647f6c937",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/implementation-national-registration.md",
+      "sourceSha256": "2fec7891d5bca8137197c7d8ec816127ac5b9223a6ecd7755071565f73c01e0a",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "df2e304740c5cf9511b7aea2cd1a554b05a7398ecc417a2d09630a68c0ba1b8f",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/native-entry-national-registration.md",
+      "sourceSha256": "c97784d9849f5ae7daf3721adae5a2d68d3fb4774a79fca53952a23770632b9f",
+      "decision": "included-static-document",
+      "reviewedSha256": "84deb27702f64ffbcac079a80ec20f36333f530d76238bd4b452587eddd0f9e9"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/property-entry-national-registration.md",
+      "sourceSha256": "90e78a6207ab48764b8eb546a7e1e2e22aca0b0e882a0dcbb6da9f8e1367b1d7",
+      "decision": "included-static-document",
+      "reviewedSha256": "bb488195d8e9f12f53b01f0c2ec0398a827d042c32a5897ed856ac2fd8f1b605"
+    },
+    {
+      "lane": "national-registration",
+      "path": "docs/research/tools/coverage_report.py",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "national-registration",
+      "path": "tools/research/coverage_report.py",
+      "sourceSha256": "1fe29e0d159723a038ea945582fab509351bbdfd5835d6091305612e615a17e7",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "national-registration",
+      "path": "tools/research/entry_national_registration.py",
+      "sourceSha256": "5a0e74eb96974ba795d70af2b5f8b9996cbe7ebc01ac57fd02ad2009fab6aa73",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "5a0e74eb96974ba795d70af2b5f8b9996cbe7ebc01ac57fd02ad2009fab6aa73"
+    },
+    {
+      "lane": "national-registration",
+      "path": "tools/research/property_entry_national_registration.py",
+      "sourceSha256": "59c2ef70f18da39dca62022f969f3ac56d7c047e2e3e2c083efa223c85ba73ff",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "{\"status\": \"unavailable\", \"reason\": \"fabricated native key, offset, function, or target is not allowed\"}"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/implementation-player-position-state.md",
+      "sourceSha256": "4d24206dc925bf177f3653b7b38ff6e79de5c87e970a8ad4ae1432c0053bf597",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "b6625ccfa80c53455e240e242dca14d0674eb5f59e51e586e71415d978933121",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/native-entry-player-position-state.md",
+      "sourceSha256": "7e55c607ba25906c94dc02ca2e8a993fcf53369cca911800a79323cbb713c253",
+      "decision": "included-static-document",
+      "reviewedSha256": "3c31a3c0082a4f83b8579a954df44837ea6626903abd6d46a507d68488242182"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/parallel-player-position-state.md",
+      "sourceSha256": "2e29fb313df885fc92a45f373e3abc1caa1e3cb4e78f738826bd10507bb1d702",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "docs/research/property-entry-player-position-state.md",
+      "sourceSha256": "fe6c757439c856464308276a7bbb4f62b4b2e049c229ce0cfec13472382b1d36",
+      "decision": "included-static-document",
+      "reviewedSha256": "14b959110e556e9ca7001e217badddd18391d1bd9ea2e2ed9d1bf2ffbe067a1b"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "tools/research/entry_player_position_state.py",
+      "sourceSha256": "574f965d0c89d53c68854654fe93862a2c510d87376139aa59225a983ca6010e",
+      "decision": "excluded-failed-check",
+      "check": "syntax-failed",
+      "reason": "invalid syntax (<unknown>, line 451)"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "tools/research/property_entry_player_position_state.py",
+      "sourceSha256": "3fb99d17a6a02f8b64895457753a677a34464e4bdf1873be0a20bd6f234c8806",
+      "decision": "excluded-failed-check",
+      "check": "syntax-failed",
+      "reason": "unterminated string literal (detected at line 697) (<unknown>, line 697)"
+    },
+    {
+      "lane": "player-position-state",
+      "path": "tools/research/summarize_positions.py",
+      "sourceSha256": "d6bc1c6dd3e7d7cc2e57330e7adfd3badbd71dbb25f12d761e72b2f4fd86b59f",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/implementation-scouting-recruitment.md",
+      "sourceSha256": "7f8363dc8eda6e80e4e66f4c1a384a304c7b30ea3e3839a3de76ba84fb47bb0e",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "c8354b53fa12d617423d3e7f97e26f4dcfab07cb2c771009d5ab4af4d0e69ff0",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/native-entry-scouting-recruitment.md",
+      "sourceSha256": "e708d9a8889a2fc648125b40b26b027295d3ff9c6b744161637f83809dac247a",
+      "decision": "included-static-document",
+      "reviewedSha256": "3166d97baaad22a93a2eeb44f22da5bdbed67117b4eff20adffa9b08e7efcb10"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/parallel-scouting-recruitment.md",
+      "sourceSha256": "c8354b53fa12d617423d3e7f97e26f4dcfab07cb2c771009d5ab4af4d0e69ff0",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "docs/research/property-entry-scouting-recruitment.md",
+      "sourceSha256": "f29782dc48e77f1f01c74c7f0c9a7bd585b07aad4a0783ec5cecf25d299eb8fc",
+      "decision": "included-static-document",
+      "reviewedSha256": "eb0b35dddacd2bcb7d996f940b31ab2076d2ced2aa1c2492295fa72323992741"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "tools/research/_test_write.py",
+      "sourceSha256": "f11bf2d21fd8c7f84a46467b5ed68e1a7d3fb5f607fa31b2c01f33fdbaa86288",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "tools/research/bounded_capture_json.py",
+      "sourceSha256": "d17f0cca1438970967e0c8c65ec7b2549e5cf06f8cbefa8b195f55e20b7fc200",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "tools/research/entry_scouting_recruitment.py",
+      "sourceSha256": "0f771ddae815aeb6b747b96bfc12abf0f82ce45b15cd6edc19bf7c3c00bd29f2",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "FAIL json_roundtrip: AssertionError()"
+    },
+    {
+      "lane": "scouting-recruitment",
+      "path": "tools/research/property_entry_scouting_recruitment.py",
+      "sourceSha256": "86f6eebc0dcde570d428537c8f56a31b0ecfe5f508b6509463d95c47ca0261ed",
+      "decision": "excluded-failed-check",
+      "check": "selftest-failed",
+      "reason": "FAIL json_roundtrip: AssertionError()"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/find_property_literals.py",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/implementation-staff-responsibilities.md",
+      "sourceSha256": "aba961d4a2945ce623355ce62fc2196fd75f566c0f5e6061402c47233f1fe2b6",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "cb0f00eb63c6603d35511fee59381d5f7cdc0254f38045e47e6a8304ddaf7354",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/native-entry-staff-responsibilities.md",
+      "sourceSha256": "6ac1b91d1073d49e364a83e11ec79353dd38b91c22409647ec7955a07adc1d8d",
+      "decision": "included-static-document",
+      "reviewedSha256": "5447d83c80a9fc82d175b18e7f1605c35bffdb036517456c0075d5912e308aae"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "docs/research/property-entry-staff-responsibilities.md",
+      "sourceSha256": "f4d970f0645516bb6292f7abc3d23dff98409a507b6926ec5823e62a89389b37",
+      "decision": "included-static-document",
+      "reviewedSha256": "5db8b7eb23d422d67b9f32a8d5d284d39d3659b176b5383c319383aaa0f16acb"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "tools/research/entry_staff_responsibilities.py",
+      "sourceSha256": "944c3d9b20a26a4363d98e4b33210c4cd20b4987c131017eef9a6ceebd87953b",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "944c3d9b20a26a4363d98e4b33210c4cd20b4987c131017eef9a6ceebd87953b"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "tools/research/find_property_literals.py",
+      "sourceSha256": "7e860b9ae0658a56ddc4e785d67f973258913dc2f2cf1f1703aed2aff37b19e6",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "staff-responsibilities",
+      "path": "tools/research/property_entry_staff_responsibilities.py",
+      "sourceSha256": "aa77cc87230f0fa9c7ea39fd8cfe67c801e06343ec74c1e12a47640f2f067e09",
+      "decision": "excluded-failed-check",
+      "check": "syntax-failed",
+      "reason": "closing parenthesis '}' does not match opening parenthesis '(' (<unknown>, line 124)"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/implementation-tactics.md",
+      "sourceSha256": "eadd7e76a5d1f8181273ed5ddb50230de121f4c4ff5b967ef49a0b8f0b8690d1",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "50588aef087ed5f135d19392d192f7460a0f868b4c47f6ac3189ec933ab6018c",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/native-entry-tactics.md",
+      "sourceSha256": "8908e5c45c7a22875c19f3035cf93731f2fc099e1d01d0d94f41adc5bd862c75",
+      "decision": "included-static-document",
+      "reviewedSha256": "855b0fc7983ba8c3561787c9fb0307d2d42789f88161a474aa836129baa0ca2f"
+    },
+    {
+      "lane": "tactics",
+      "path": "docs/research/property-entry-tactics.md",
+      "sourceSha256": "10b84903f553119ace039d87a9071627b80985a39082dfe3c09f0f3113462326",
+      "decision": "included-static-document",
+      "reviewedSha256": "3f34657fc7d042a7ffebe6bf95db3c4236a2968fe15bd04d500f21afdef90a3e"
+    },
+    {
+      "lane": "tactics",
+      "path": "tools/research/entry_tactics.py",
+      "sourceSha256": "99340abdaca6e29f292717ce86403f47c20d16b8046b5102df57f368d18b08a8",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "99340abdaca6e29f292717ce86403f47c20d16b8046b5102df57f368d18b08a8"
+    },
+    {
+      "lane": "tactics",
+      "path": "tools/research/locate_vtable_function.py",
+      "sourceSha256": "ff1e139918fa85a83ba7cdf667ae4c948196ec51fec9a88bd37733af5a2505e4",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "tactics",
+      "path": "tools/research/property_entry_tactics.py",
+      "sourceSha256": "da78e7ae95d30b8425baadb32a1c1d21b05621b860cbbb08117a1838cbae2135",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "2d487986d39cd63ee130654d3f20eaecab331fe279b4ecf144067be35c7c312b"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/implementation-training-development.md",
+      "sourceSha256": "454314ad31f7811d62e7060c85e0519a5a3032d6c782c06f89d118a20c6043b9",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "476d8d721e24c6059688da8f38038e812da838550aaf8ee1a8dfa882f18d7bf6",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/native-entry-training-development.md",
+      "sourceSha256": "6867ab8f93bf56faa3ddd8682afeecbf148a8bc8636aea13f31d6cdf94226e0f",
+      "decision": "included-static-document",
+      "reviewedSha256": "e0c91b2f0b8c52d9d5fa0b5f9aff10c9f2041387edb709ad4d4966dc7a2180f9"
+    },
+    {
+      "lane": "training-development",
+      "path": "docs/research/property-entry-training-development.md",
+      "sourceSha256": "19d175f6e59588454be1be37bdb986bfd0d2d11a52972353dfcfcb43f548787b",
+      "decision": "included-static-document",
+      "reviewedSha256": "1033f08ff0f4bc83e91c543923a1080390ad9fadfb4cdee6ee5c210f55facb54"
+    },
+    {
+      "lane": "training-development",
+      "path": "tools/research/entry_training_development.py",
+      "sourceSha256": "ca6fd5846ae9c97bc32accf1b8d15f22bff54d4d30ee1c6656362bd67b335721",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "ca6fd5846ae9c97bc32accf1b8d15f22bff54d4d30ee1c6656362bd67b335721"
+    },
+    {
+      "lane": "training-development",
+      "path": "tools/research/find_literal_slots.py",
+      "sourceSha256": "d55da595dbf22e1ef8bc0abe978bfd00bf75f8433c02004f96599dcbfdf9c566",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "training-development",
+      "path": "tools/research/property_entry_training_development.py",
+      "sourceSha256": "b34baa3a01d4275858554486954376b30e4172309161bab7b343ce89936dd465",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "b34baa3a01d4275858554486954376b30e4172309161bab7b343ce89936dd465"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/data-discovery-todo.md",
+      "sourceSha256": "0a3a0e2bbe86053b6cc47f5368eae831a3946231afef20798ed6c15a9c8df368",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/implementation-wave-input.md",
+      "sourceSha256": "e8e3060d22235ef7864b2defb2b9368c1274ba93b1a5b7c257f5b4ff416fac6c",
+      "decision": "excluded-duplicate-input-or-temporary-artifact"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/implementation-youth-development.md",
+      "sourceSha256": "d5f41c887c332077727bf0cef99360586e19572c9b4c85a5e9bbcbe9ba2ad6a4",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/interface-inventory.md",
+      "sourceSha256": "94db4e5acde760826d2dd0429e2ca336e49e3314e08207ec2bd1e29dbda404de",
+      "decision": "retain-reviewed-integrated-version"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/native-entry-youth-development.md",
+      "sourceSha256": "db0ea2efc5cf862fb55bde3237256238056a893f0767047b316ced47795a357a",
+      "decision": "included-static-document",
+      "reviewedSha256": "c514e885de4a865544ca7d7114a71ac3b71c9c6221f71413e8cf70ded939a430"
+    },
+    {
+      "lane": "youth-development",
+      "path": "docs/research/property-entry-youth-development.md",
+      "sourceSha256": "c0fe006b0ef0542cdf47eea0b1115d06f39ec73360cc0300d9da8229c1647670",
+      "decision": "included-static-document",
+      "reviewedSha256": "baa01513a2c1e72d42cec8aae89eb1d6949bef6176a7c3ff47e945f38c003289"
+    },
+    {
+      "lane": "youth-development",
+      "path": "tools/research/entry_youth_development.py",
+      "sourceSha256": "577150908912d243c61743d6be9775e14113038dc139724044253db3ff565a0a",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "577150908912d243c61743d6be9775e14113038dc139724044253db3ff565a0a"
+    },
+    {
+      "lane": "youth-development",
+      "path": "tools/research/property_entry_youth_development.py",
+      "sourceSha256": "0b812b35840645174aa1e3fe9a350cc0215ac9bcc4f0843a6a20cc79c6729c58",
+      "decision": "included-offline-tool",
+      "check": "passed",
+      "reviewedSha256": "8efe26db57568026a153fcc798775b1be387fbc00906ba2af7bc4b28e0886194"
+    },
+    {
+      "lane": "youth-development",
+      "path": "tools/research/summarize_club_teams.py",
+      "sourceSha256": "e5d6c783afc00c1c8a1e70d00d22c420fbd03343ec88f8508ef1251435eb2917",
+      "decision": "retain-reviewed-integrated-version"
+    }
+  ]
+}
