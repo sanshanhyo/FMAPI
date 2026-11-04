@@ -442,6 +442,24 @@ public sealed class HostTests
         Assert.Equal(GameReadStatus.Failed, result.Status);
         Assert.Null(result.Snapshot);
     }
+    // Characterization only: these observations are NOT approved lifecycle semantics.
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CharacterizeLifecycleReentryDuringLoad(bool shutdown)
+    {
+        using var host = new ModHost(new SpyAdapter());
+        var mod = new TestMod(onLoad: _ =>
+        {
+            if (shutdown) host.Dispose();
+            else host.Unload("org.fmapi.test");
+        });
+        host.Load(mod);
+        Assert.Empty(host.LoadedModIds);
+        Assert.Equal(1, mod.Unloads);
+        Assert.Throws<InvalidOperationException>(() => mod.Context!.Game.ReadSnapshot());
+        Console.WriteLine($"OBSERVED: shutdown={shutdown}; Load returned; active=0; cleanup=1; captured context revoked. Not approved contract.");
+    }
     private static UiExtension Panel() => new("overview", UiExtensionKind.Panel, "Test panel", "test.location");
     private static ModHost WritableHost(IGameAdapter adapter) => new(adapter, new(true, [WriteCommand]));
     private static ModGrant FullGrant() => new(Enum.GetValues<ModCapability>(), [WriteCommand]);
