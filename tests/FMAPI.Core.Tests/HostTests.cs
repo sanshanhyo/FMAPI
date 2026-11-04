@@ -479,6 +479,38 @@ public sealed class HostTests
         host.Unload(replacement.Manifest.Id);
         Assert.Equal(1, replacement.Unloads);
     }
+    [Fact]
+    public void SerializedPublishInvokesCallbackOnPublishingThreadBeforeReturning()
+    {
+        using var host = new ModHost(new SpyAdapter());
+        int callbackThread = 0, publishingThread = 0;
+        bool returned = false;
+        Exception? workerFailure = null;
+        var mod = new TestMod(onLoad: context => context.Events.Subscribe<int>(_ =>
+        {
+            callbackThread = Environment.CurrentManagedThreadId;
+            Assert.False(returned);
+        }));
+        host.Load(mod);
+        var worker = new Thread(() =>
+        {
+            try
+            {
+                publishingThread = Environment.CurrentManagedThreadId;
+                var report = host.Publish(1);
+                Assert.Equal(1, report.Delivered);
+                Assert.Empty(report.Failures);
+                returned = true;
+            }
+            catch (Exception error) { workerFailure = error; }
+        }) { IsBackground = true };
+        worker.Start();
+        Assert.True(worker.Join(TimeSpan.FromSeconds(10)), "Serialized publish did not complete.");
+        Assert.Null(workerFailure);
+        Assert.True(returned);
+        Assert.Equal(publishingThread, callbackThread);
+        Assert.NotEqual(Environment.CurrentManagedThreadId, callbackThread);
+    }
     private static UiExtension Panel() => new("overview", UiExtensionKind.Panel, "Test panel", "test.location");
     private static ModHost WritableHost(IGameAdapter adapter) => new(adapter, new(true, [WriteCommand]));
     private static ModGrant FullGrant() => new(Enum.GetValues<ModCapability>(), [WriteCommand]);

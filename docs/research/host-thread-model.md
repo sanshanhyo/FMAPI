@@ -1,0 +1,13 @@
+# Host thread model
+
+Current support boundary: FMAPI.Core.ModHost is a synchronous, caller-serialized host, not a thread-safe concurrent runtime and not a game-thread dispatcher. Internal locks/Interlocked operations do not extend that contract. Lifecycle operations, service calls, publishing and collection inspection should be coordinated by the owning host on one execution lane. Sequential handoff to another thread is not automatic game-thread safety. Real adapters may impose stronger thread affinity; none is implemented here.
+
+Existing deterministic guarantee: Core invokes an event handler synchronously on the publishing thread, and reports its completion/failure before Publish returns. New test loads on the test thread, publishes on a dedicated thread with no overlapping host operations, joins that thread, then disposes on the test thread. It verifies thread identity and completion ordering without sleeps. No assertion of overlapping publish/lifecycle safety follows.
+
+Lock review: registry locks protect subscription/UI collections; callback dispatch releases registry lock before taking owner scope lock; game reads and callbacks can execute while holding scope locks. Two concurrent callbacks that wait for each other's lifecycle operations could deadlock. Public LoadedModIds enumerates a dictionary without a host-wide concurrent mutation protocol. disposed/registration transitions are not a global synchronization mechanism. Do not expose a background task to IModContext and assume it remains valid.
+
+Safe caller boundary: serialize all host and scoped-service calls on the host-owned lane; do not block that lane/callback on worker threads that need host access; perform external CPU work on copied values and return through the owner's scheduling mechanism after checking registration/session validity. FMAPI supplies no scheduler or queued lifecycle operation implementation. Avoid general nested lifecycle transitions until separately specified; narrow read/OnLoad revocation fixes remain in effect.
+
+No new runtime synchronization or public concurrency guarantee is introduced by this document. Full multithread safety would require an explicit ordering/cancellation/scheduler design and deadlock analysis, not a passing stress loop. Save-context permission wrapper and game lifecycle are still unimplemented. Tests use owned fixtures and cached dependencies only; pinned restore blocker remains.
+
+Executed:76 cached-dependency tests passed (0 failed/skipped), ExitCode0, SDK10.0.403/net10.0. No runtime implementation changed; no demo rerun required for test/documentation-only stage. This verifies synchronous serialized publication, not concurrent host use.

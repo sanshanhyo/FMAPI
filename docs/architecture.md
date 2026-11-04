@@ -75,3 +75,5 @@ The internal Windows `ReadSessionGate` rejects mismatched or synthetic builds, u
 Current experimental interface status and unresolved lifecycle boundaries are tracked in [the closeout review](research/first-interface-closeout-review.md). Ordinary lifecycle calls remain caller-serialized; no general reentrant lifecycle guarantee is defined.
 
 A successful Load now requires its original registration to remain active after OnLoad. Callback-driven revocation causes ModLoadException; completed cleanup is not repeated and same-ID replacement registrations are preserved. See [the minimal completion invariant](research/onload-completion-invariant.md). This does not define general lifecycle reentry or concurrency.
+
+The current Core host is caller-serialized across lifecycle, publishing, scoped-service calls and inspection; internal locks do not establish overall thread safety. Core event callbacks run synchronously on the publishing thread. See [thread model and safe caller boundary](research/host-thread-model.md); no scheduler/game-thread dispatch is provided.
