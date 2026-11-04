@@ -18,8 +18,10 @@ public sealed class MockSaveContextReader : ISaveContextReader, IDisposable
 
     public void Clear() => current = null;
 
-    public SaveContextResult ReadCurrentSave() => current is null
-        ? new(SaveContextStatus.Unavailable, "No synthetic save fixture loaded.")
+    public SaveContextResult ReadCurrentSave() => disposed
+        ? new(SaveContextStatus.Unavailable, "Reader is closed.", null, SaveContextError.Closed)
+        : current is null
+        ? new(SaveContextStatus.Unavailable, "No synthetic save fixture loaded.", null, SaveContextError.NoSave)
         : new(SaveContextStatus.Available, "Synthetic fixture only.", current);
 
     public void Dispose() { Clear(); disposed = true; }
