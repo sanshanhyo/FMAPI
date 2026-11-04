@@ -7,4 +7,5 @@
   <ItemGroup>
     <ProjectReference Include="../FMAPI.Sdk/FMAPI.Sdk.csproj" />
   </ItemGroup>
+  <ItemGroup><Compile Include="../Shared/GameDate.cs" Link="Internal/GameDate.cs" /></ItemGroup>
 </Project>
