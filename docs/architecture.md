@@ -71,3 +71,5 @@ The opt-in `FMAPI.Host.BepInEx` project references the external BepInEx package 
 ## Experimental read-session prerequisite
 
 The internal Windows `ReadSessionGate` rejects mismatched or synthetic builds, unverified sources and unavailable saves. Replacing or invalidating a session expires earlier tokens. Callers must serialize it and invalidate on selection/save changes and shutdown. This is an offline prerequisite implementation only: it is not wired into the placeholder adapter, detects no game lifecycle and provides no lock or atomic snapshot. No public SDK changes or new compatibility claims are introduced.
+
+Current experimental interface status and unresolved lifecycle boundaries are tracked in [the closeout review](research/first-interface-closeout-review.md). Ordinary lifecycle calls remain caller-serialized; no general reentrant lifecycle guarantee is defined.

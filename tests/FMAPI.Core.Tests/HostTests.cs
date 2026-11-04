@@ -431,6 +431,17 @@ public sealed class HostTests
         Assert.Equal(1, adapter.Reads);
         Assert.Throws<InvalidOperationException>(() => mod.Context.Game.ReadSnapshot());
     }
+    [Fact]
+    public void InvalidAdapterCannotReturnAvailableWithoutSnapshot()
+    {
+        var adapter = new SpyAdapter { ReturnNullSnapshot = true };
+        using var host = new ModHost(adapter);
+        var mod = new TestMod(capabilities: [ModCapability.GameRead]);
+        host.Load(mod, new ModGrant([ModCapability.GameRead]));
+        var result = mod.Context!.Game.ReadSnapshot();
+        Assert.Equal(GameReadStatus.Failed, result.Status);
+        Assert.Null(result.Snapshot);
+    }
     private static UiExtension Panel() => new("overview", UiExtensionKind.Panel, "Test panel", "test.location");
     private static ModHost WritableHost(IGameAdapter adapter) => new(adapter, new(true, [WriteCommand]));
     private static ModGrant FullGrant() => new(Enum.GetValues<ModCapability>(), [WriteCommand]);
@@ -477,6 +488,7 @@ public sealed class HostTests
     private sealed class SpyAdapter : IGameAdapter
     {
         public AdapterDescriptor Descriptor { get; }
+        public bool ReturnNullSnapshot { get; set; }
         public Action? OnRead { get; set; }
         public int Reads { get; private set; }
         public int Validations { get; private set; }
@@ -494,6 +506,7 @@ public sealed class HostTests
         {
             Reads++;
             OnRead?.Invoke();
+            if (ReturnNullSnapshot) return null!;
             return new(Descriptor.Build, new Dictionary<string, string> { ["test"] = "synthetic" });
         }
 

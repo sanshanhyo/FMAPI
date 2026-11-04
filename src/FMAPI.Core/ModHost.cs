@@ -156,6 +156,8 @@ public sealed class ModHost : IDisposable
                 // Adapter callbacks may reenter unload/dispose on this same monitor.
                 if (!scope.Active)
                     return new(GameReadStatus.Failed, "Read scope was revoked during capture; snapshot discarded.");
+                if (snapshot is null)
+                    return new(GameReadStatus.Failed, "Adapter returned no snapshot.");
                 return new(GameReadStatus.Available, "Snapshot available.", snapshot);
             }
             catch (Exception error)
