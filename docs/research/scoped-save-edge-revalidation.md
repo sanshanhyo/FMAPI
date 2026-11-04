@@ -1,0 +1,13 @@
+# Scoped save reader edge-case revalidation
+
+Three additional synthetic cases exercise the existing implementation without production changes: failed OnLoad leaves captured reader Expired and source invocation count0; source exception returns Failed/null and does not expose an owned marker in exception text; illegal null source result returns Failed/null with one source call. These are regression/contract tests; no previously failing production behavior is claimed unless actual logs show failure.
+
+net6 revalidation uses installed SDK10 and existing net6 reference pack6.0.36, no install/download. Mock and sample normally declare net10; running all source tests under net6 requires explicit TargetFramework/TargetFrameworks=net6.0 and LangVersion12 overrides. This is supplementary compatibility evidence, not a change to supported target declarations.
+
+Old consumer binary was compiled in the earlier acceptance stage against pre-hardening SaveContext contract with matching assembly identity0.1.0.0. Replacing its SDK DLL with newly built net6 SDK and executing without recompiling consumer tests retained constructor/property/deconstruction binary calls only. It does not validate removed init setters, all historical API surface, behavioral equivalence or a real mod loader.
+
+Remaining limits: pinned dependencies remain unavailable/TLS blocked; cached xunit2.9.2/Test.Sdk17.11.1/runner2.8.2 used. Serialized host/source only; reliable generation reporting is trusted, no real observer/game access. No screenshots required for console-only tests; raw output with home paths redacted is delivered.
+
+First full net6 project-reference attempt failed because Mock/Sample declared net10 target references were not retargeted by the outer test build. Preserved as failure, not acceptance. Subsequent verification builds each project separately with explicit target overrides, then compiles all tests against resulting DLL references. The initial consumer pass after failed build used stale DLL and is excluded; only a later run after confirmed current SDK build counts.
+
+Final observed results: net10 full86 tests pass ExitCode0; each supplemental net6 project build reports success/zero warnings/errors; current-SDK old binary consumer passes ExitCode0 (SDK hashes retained). However full net6 DLL-reference test compilation FAILS (System.Runtime6/10 conflict, including CS1705 SampleMod, and missing interface resolution). Thus full net6 suite is NOT accepted; build logs alone do not establish compatibility. Temporary harness/framework resolution needs separate isolation; no project target declarations changed. Source exception/null/failed-load behavior required no production fix.
