@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework /><TargetFrameworks>net6.0;net10.0</TargetFrameworks><OutputType>Exe</OutputType><UseAppHost>false</UseAppHost><LangVersion>12.0</LangVersion><CheckEolTargetFramework>false</CheckEolTargetFramework></PropertyGroup>
+<ItemGroup><ProjectReference Include="../../src/FMAPI.Sdk/FMAPI.Sdk.csproj" /></ItemGroup>
+</Project>
