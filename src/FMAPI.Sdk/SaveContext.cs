@@ -41,3 +41,15 @@ public interface ISaveContextReader
 {
     SaveContextResult ReadCurrentSave();
 }
+
+// Optional context extension; existing IModContext implementations remain valid.
+public interface IModSaveContext
+{
+    ISaveContextReader SaveContext { get; }
+}
+
+// Trusted adapter contract, serialized with capture. Increment on every context change.
+public interface ISaveContextSessionSource : ISaveContextReader
+{
+    long Generation { get; }
+}

@@ -15,12 +15,16 @@ public sealed class ModHost : IDisposable
     private readonly EventRegistry events = new();
     private readonly UiRegistry ui = new();
     private bool disposed;
+    private readonly ISaveContextSessionSource? saveContextSource;
 
-    public ModHost(IGameAdapter adapter, ModHostOptions? options = null)
+    public ModHost(IGameAdapter adapter, ModHostOptions? options = null) : this(adapter, options, null) { }
+
+    public ModHost(IGameAdapter adapter, ModHostOptions? options, ISaveContextSessionSource? saveContextSource)
     {
         this.adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
         descriptor = adapter.Descriptor ?? throw new ArgumentException("Adapter descriptor is required.", nameof(adapter));
         this.options = options ?? new ModHostOptions();
+        this.saveContextSource = saveContextSource;
     }
 
     public IReadOnlyList<string> LoadedModIds => mods.Keys.OrderBy(id => id, StringComparer.Ordinal).ToArray();
@@ -214,7 +218,28 @@ public sealed class ModHost : IDisposable
         }
     }
 
-    private sealed class ModContext : IModContext, IModEvents, IModUi, IModGame
+    private SaveContextResult ReadCurrentSave(ModScope scope)
+    {
+        lock (scope.Gate)
+        {
+            if (!scope.Active) return new(SaveContextStatus.Unavailable, "Mod registration expired.", null, SaveContextError.Expired);
+            if (!scope.HasCapability(ModCapability.GameRead)) return new(SaveContextStatus.Unavailable, "GameRead denied.", null, SaveContextError.Denied);
+            if (saveContextSource is null) return new(SaveContextStatus.Unavailable, "Save context source unavailable.", null, SaveContextError.Unsupported);
+            try
+            {
+                var generation = saveContextSource.Generation;
+                var result = saveContextSource.ReadCurrentSave();
+                if (!scope.Active || generation != saveContextSource.Generation)
+                    return new(SaveContextStatus.Unavailable, "Context changed during capture.", null, SaveContextError.Expired);
+                return result ?? new(SaveContextStatus.Unavailable, "Source returned no result.", null, SaveContextError.Failed);
+            }
+            catch (Exception)
+            {
+                return new(SaveContextStatus.Unavailable, "Save context capture failed.", null, SaveContextError.Failed);
+            }
+        }
+    }
+    private sealed class ModContext : IModContext, IModEvents, IModUi, IModGame, IModSaveContext, ISaveContextReader
     {
         private readonly ModHost host;
         private readonly ModScope scope;
@@ -222,6 +247,8 @@ public sealed class ModHost : IDisposable
         public IModEvents Events => this;
         public IModUi Ui => this;
         public IModGame Game => this;
+        public ISaveContextReader SaveContext => this;
+        public SaveContextResult ReadCurrentSave() => host.ReadCurrentSave(scope);
         public AdapterDescriptor Adapter => host.descriptor;
 
         public ModContext(ModHost host, ModScope scope) => (this.host, this.scope) = (host, scope);
