@@ -67,3 +67,7 @@ Reuse BepInEx for bootstrap and plugin loading; FMAPI owns domain APIs, scoped s
 `Adapters.Windows` currently contains only an explicitly unavailable placeholder. It never reads a process or returns a snapshot. The CLI's `windows-status` command reports this without falling back to the mock; exit code 3 means integration is unavailable. Existing mock demonstration behavior is unchanged.
 
 The opt-in `FMAPI.Host.BepInEx` project references the external BepInEx package and owns one default-deny Core host. Consumers register SDK mods through its thin wrapper API and dispose the returned registration on unload. Its session logic is checked offline; actual chainloader/Unity execution is unverified. See [bridge build instructions](bepinex-host.md).
+
+## Experimental read-session prerequisite
+
+The internal Windows `ReadSessionGate` rejects mismatched or synthetic builds, unverified sources and unavailable saves. Replacing or invalidating a session expires earlier tokens. Callers must serialize it and invalidate on selection/save changes and shutdown. This is an offline prerequisite implementation only: it is not wired into the placeholder adapter, detects no game lifecycle and provides no lock or atomic snapshot. No public SDK changes or new compatibility claims are introduced.
