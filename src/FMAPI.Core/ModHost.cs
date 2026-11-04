@@ -45,6 +45,8 @@ public sealed class ModHost : IDisposable
         }
         catch (Exception error)
         {
+            if (!scope.Active)
+                throw new ModLoadException($"Mod '{manifest.Id}' failed after its registration was revoked.", error);
             RemoveScope(scope);
             // Give a partially initialized mod a chance to release its own resources.
             try
@@ -57,6 +59,8 @@ public sealed class ModHost : IDisposable
             }
             throw new ModLoadException($"Mod '{manifest.Id}' failed to load.", error);
         }
+        if (!scope.Active)
+            throw new ModLoadException($"Mod '{manifest.Id}' was revoked during OnLoad.");
     }
 
     public bool Unload(string modId)

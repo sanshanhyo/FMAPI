@@ -442,11 +442,11 @@ public sealed class HostTests
         Assert.Equal(GameReadStatus.Failed, result.Status);
         Assert.Null(result.Snapshot);
     }
-    // Characterization only: these observations are NOT approved lifecycle semantics.
+    // A completed Load must correspond to its own still-active registration.
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void CharacterizeLifecycleReentryDuringLoad(bool shutdown)
+    public void RevokedDuringOnLoadCannotReportSuccessfulLoad(bool shutdown)
     {
         using var host = new ModHost(new SpyAdapter());
         var mod = new TestMod(onLoad: _ =>
@@ -454,11 +454,30 @@ public sealed class HostTests
             if (shutdown) host.Dispose();
             else host.Unload("org.fmapi.test");
         });
-        host.Load(mod);
+        Assert.Throws<ModLoadException>(() => host.Load(mod));
         Assert.Empty(host.LoadedModIds);
         Assert.Equal(1, mod.Unloads);
         Assert.Throws<InvalidOperationException>(() => mod.Context!.Game.ReadSnapshot());
-        Console.WriteLine($"OBSERVED: shutdown={shutdown}; Load returned; active=0; cleanup=1; captured context revoked. Not approved contract.");
+    }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void OuterLoadFailurePreservesReentrantSameIdReplacement(bool throwAfterReplacement)
+    {
+        using var host = new ModHost(new SpyAdapter());
+        var replacement = new TestMod();
+        var original = new TestMod(onLoad: _ =>
+        {
+            host.Unload("org.fmapi.test");
+            host.Load(replacement);
+            if (throwAfterReplacement) throw new InvalidOperationException("owned post-revocation failure");
+        });
+        Assert.Throws<ModLoadException>(() => host.Load(original));
+        Assert.Single(host.LoadedModIds);
+        Assert.Equal(1, original.Unloads);
+        Assert.Equal(0, replacement.Unloads);
+        host.Unload(replacement.Manifest.Id);
+        Assert.Equal(1, replacement.Unloads);
     }
     private static UiExtension Panel() => new("overview", UiExtensionKind.Panel, "Test panel", "test.location");
     private static ModHost WritableHost(IGameAdapter adapter) => new(adapter, new(true, [WriteCommand]));
