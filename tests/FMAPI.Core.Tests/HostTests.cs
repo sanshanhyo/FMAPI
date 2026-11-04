@@ -368,6 +368,53 @@ public sealed class HostTests
         Assert.Equal("Changed FC", mod.ReadSnapshot().Snapshot!.Values["club.name"]);
     }
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public void ReadRequiresBothManifestRequestAndHostGrantWithoutCallingAdapter(bool requested, bool granted)
+    {
+        var adapter = new SpyAdapter();
+        using var host = new ModHost(adapter);
+        var mod = new TestMod(capabilities: requested ? [ModCapability.GameRead] : []);
+        host.Load(mod, new ModGrant(granted ? [ModCapability.GameRead] : []));
+        Assert.Equal(GameReadStatus.Denied, mod.Context!.Game.ReadSnapshot().Status);
+        Assert.Equal(0, adapter.Reads);
+    }
+
+    [Fact]
+    public void OldReaderCannotAcquireReplacementRegistrationWithSameId()
+    {
+        var adapter = new SpyAdapter();
+        using var host = new ModHost(adapter);
+        var first = new TestMod(capabilities: [ModCapability.GameRead]);
+        host.Load(first, new ModGrant([ModCapability.GameRead]));
+        var old = first.Context!.Game;
+        Assert.Equal(GameReadStatus.Available, old.ReadSnapshot().Status);
+        host.Unload(first.Manifest.Id);
+        var replacement = new TestMod(capabilities: [ModCapability.GameRead]);
+        host.Load(replacement, new ModGrant([ModCapability.GameRead]));
+        Assert.Throws<InvalidOperationException>(() => old.ReadSnapshot());
+        Assert.Equal(1, adapter.Reads);
+        Assert.Equal(GameReadStatus.Available, replacement.Context!.Game.ReadSnapshot().Status);
+        Assert.Equal(2, adapter.Reads);
+    }
+
+    [Fact]
+    public void FailedLoadRevokesCapturedReaderBeforeAnotherRegistration()
+    {
+        var adapter = new SpyAdapter();
+        using var host = new ModHost(adapter);
+        IModGame? captured = null;
+        var mod = new TestMod(capabilities: [ModCapability.GameRead], onLoad: context =>
+        {
+            captured = context.Game;
+            throw new InvalidOperationException("owned test failure");
+        });
+        Assert.Throws<ModLoadException>(() => host.Load(mod, new ModGrant([ModCapability.GameRead])));
+        Assert.Throws<InvalidOperationException>(() => captured!.ReadSnapshot());
+        Assert.Equal(0, adapter.Reads);
+    }
     private static UiExtension Panel() => new("overview", UiExtensionKind.Panel, "Test panel", "test.location");
     private static ModHost WritableHost(IGameAdapter adapter) => new(adapter, new(true, [WriteCommand]));
     private static ModGrant FullGrant() => new(Enum.GetValues<ModCapability>(), [WriteCommand]);
